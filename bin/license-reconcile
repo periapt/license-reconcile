@@ -5,22 +5,30 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Slurp;
 use Readonly;
+use Debian::LicenseReconcile::FormatSpec;
 
 my $man = 0;
 my $help = 0;
 
 my $copyright = 'debian/copyright';
 
+my $format_spec = 1;
+
 GetOptions(
     'help|?' => \$help,
     man => \$man,
     'copyright=s' => \$copyright,
+    'format-spec!' => \$format_spec,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
-sleep 1;
+
+if ($format_spec) {
+    warn "could not recognize format"
+        if not Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
+}
 
 =head1 NAME
 
@@ -30,7 +38,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>]
 
 =head1 DESCRIPTION
 
@@ -52,4 +60,13 @@ contained in a matching paragraph from the copyright file?
 
 =back
 
+=head1 OPTIONS
 
+=head2 B<--copyright=>I<file>
+
+Specify an alternative copyright file. Defaults to C<debian/copyright>.
+
+=head2 B<--no-format-spec>
+
+Don't check the first line of the copyright file against permitted format
+specifications.
