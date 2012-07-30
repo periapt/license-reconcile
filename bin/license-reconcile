@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+
+my $man = 0;
+my $help = 0;
+
+my $copyright = 'debian/copyright';
+
+GetOptions(
+    'help|?' => \$help,
+    man => \$man
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+=head1 NAME
+
+license-reconcile - reconcile debian/copyright against source
+
+=head1 SYNOPSIS
+
+B<license-reconcile> B<--help>|B<--man>
+
+B<licensecheck> [B<--no-conf>] [B<--verbose>] [B<--copyright>]
+[B<-l>|B<--lines=>I<N>] [B<-i>|B<--ignore=>I<regex>] [B<-c>|B<--check=>I<regex>]
+[B<-r>|B<--recursive>] I<list of files and directories to check>
+
+=head1 DESCRIPTION
+
+B<licensecheck> attempts to determine the license that applies to each file
+passed to it, by searching the start of the file for text belonging to
+various licenses.
+
+If any of the arguments passed are directories, B<licensecheck> will add
+the files contained within to the list of files to process.
+
+
