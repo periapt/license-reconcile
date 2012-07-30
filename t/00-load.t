@@ -1,6 +1,7 @@
-#!perl -T
+#!perl 
 
-use Test::More tests => 2;
+use Test::More tests => 3;
+use Test::Compile;
 
 BEGIN {
     use_ok( 'Debian::LicenseReconcile' ) || print "Bail out!\n";
@@ -8,3 +9,5 @@ BEGIN {
 }
 
 diag( "Testing Debian::LicenseReconcile $Debian::LicenseReconcile::VERSION, Perl $], $^X" );
+
+pl_file_ok('bin/license-reconcile');

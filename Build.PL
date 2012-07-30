@@ -10,6 +10,7 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Debian/LicenseReconcile.pm',
     build_requires => {
         'Test::More' => 0,
+        'Test::Compile' => 0,
     },
     requires => {
         'perl' => 5.006,
