@@ -5,6 +5,7 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Slurp;
 use Readonly;
+use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::FormatSpec;
 
 my $man = 0;
@@ -26,9 +27,10 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
 
 if ($format_spec) {
-    warn "could not recognize format"
-        if not Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
+        Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
 }
+
+exit(Debian::LicenseReconcile::Errors->how_many);
 
 =head1 NAME
 
