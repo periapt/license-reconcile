@@ -4,7 +4,7 @@ use Test::More tests => 3;
 use Test::Compile;
 
 BEGIN {
-    use_ok( 'Debian::LicenseReconcile' ) || print "Bail out!\n";
+    use_ok( 'Debian::LicenseReconcile::Errors' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::FormatSpec' ) || print "Bail out!\n";
 }
 
