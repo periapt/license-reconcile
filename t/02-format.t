@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::FormatSpec;
@@ -29,4 +29,19 @@ cmp_deeply(\@list, [
         msg=>'copyright data is empty',
     },
 ], 'initial state');
+
+is(Debian::LicenseReconcile::FormatSpec->check(read_file('t/data/bad-format')), 0, 'bad format');
+is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    {
+        test=>'Debian::LicenseReconcile::FormatSpec',
+        msg=>'copyright data is empty',
+    },
+    {
+        test=>'Debian::LicenseReconcile::FormatSpec',
+        msg=>'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/',
+    },
+], 'initial state');
+
 

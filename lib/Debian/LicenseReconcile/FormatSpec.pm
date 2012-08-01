@@ -60,7 +60,7 @@ sub check {
         test => __PACKAGE__,
         msg => "Cannot recognize format: $lines[0]",
     );
-    return 1;
+    return 0;
 }
 
 =head1 AUTHOR
