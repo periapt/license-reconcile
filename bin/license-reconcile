@@ -32,6 +32,12 @@ if ($format_spec) {
         Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
 }
 
+Readonly my $COPYRIGHT_TREE
+    => Debian::LicenseReconcile::CopyrightTarget->new($COPYRIGHT_TEXT);
+
+if ($COPYRIGHT_TREE) {
+}
+
 if (not $quiet) {
     foreach my $error (Debian::LicenseReconcile::Errors->list) {
         my @test = split '::', $error->{test};
