@@ -9,6 +9,7 @@ use Readonly;
 Readonly my %PERMITTED_FORMATS => (
     'Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/'=>1,
 );
+Readonly my $TEST => 'FormatSpec';
 
 Readonly my $NL => "\n";
 
@@ -48,7 +49,7 @@ sub check {
 
     if (scalar @lines == 0) {
         Debian::LicenseReconcile::Errors->push(
-            test => __PACKAGE__,
+            test => $TEST,
             msg => 'copyright data is empty',
         );
         return 0;
@@ -57,7 +58,7 @@ sub check {
     return 1 if exists $PERMITTED_FORMATS{$lines[0]};
 
     Debian::LicenseReconcile::Errors->push(
-        test => __PACKAGE__,
+        test => $TEST,
         msg => "Cannot recognize format: $lines[0]",
     );
     return 0;

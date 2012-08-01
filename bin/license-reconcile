@@ -40,8 +40,7 @@ if ($COPYRIGHT_TREE) {
 
 if (not $quiet) {
     foreach my $error (Debian::LicenseReconcile::Errors->list) {
-        my @test = split '::', $error->{test};
-        print "$test[$#test]: $error->{msg}\n";
+        print "$error->{test}: $error->{msg}\n";
     }
 }
 

@@ -15,7 +15,7 @@ is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [
     {
-        test=>'Debian::LicenseReconcile::FormatSpec',
+        test=>'FormatSpec',
         msg=>'copyright data is empty',
     },
 ], 'initial state');
@@ -25,7 +25,7 @@ is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [
     {
-        test=>'Debian::LicenseReconcile::FormatSpec',
+        test=>'FormatSpec',
         msg=>'copyright data is empty',
     },
 ], 'initial state');
@@ -35,11 +35,11 @@ is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [
     {
-        test=>'Debian::LicenseReconcile::FormatSpec',
+        test=>'FormatSpec',
         msg=>'copyright data is empty',
     },
     {
-        test=>'Debian::LicenseReconcile::FormatSpec',
+        test=>'FormatSpec',
         msg=>'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/',
     },
 ], 'initial state');

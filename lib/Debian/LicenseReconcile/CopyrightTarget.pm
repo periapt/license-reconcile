@@ -4,12 +4,28 @@ use 5.006;
 use strict;
 use warnings;
 use Debian::LicenseReconcile::Errors;
+use Debian::Copyright;
 use Tree::RedBlack;
 
 sub new {
     my $class = shift;
+    my $copyright = shift;
+
     my $self = Tree::RedBlack->new;
     bless $self, $class;
+
+    my $parser = Debian::Copyright->new($copyright);
+    eval {
+        $parser->read(\$copyright);
+    };
+    if ($@) {
+        my $msg = $@;
+        Debian::LicenseReconcile::Errors->push(
+            test => 'CopyrightParsing',
+            msg => $msg,
+        );
+        return;
+    }
 
     return $self;
 }
