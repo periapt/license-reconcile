@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::CopyrightTarget;
@@ -15,13 +15,13 @@ my $copyright = Debian::LicenseReconcile::CopyrightTarget->new("Blah: hello\n");
 is($copyright, undef, 'failed parse');
 
 is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
-#@list = Debian::LicenseReconcile::Errors->list;
-#cmp_deeply(\@list, [
-#    {
-#        test=>'Debian::LicenseReconcile::FormatSpec',
-#        msg=>'copyright data is empty',
-#    },
-#], 'initial state');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    {
+        test=>'CopyrightParsing',
+        msg=>"Got copyright stanza with unrecognised field\n",
+    },
+], 'bad copyright');
 #
 #is(Debian::LicenseReconcile::FormatSpec->check(read_file('t/data/good-format')), 1, 'good format');
 #is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
