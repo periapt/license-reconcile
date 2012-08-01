@@ -10,6 +10,7 @@ use Debian::LicenseReconcile::FormatSpec;
 
 my $man = 0;
 my $help = 0;
+my $quiet = 0;
 
 my $copyright = 'debian/copyright';
 
@@ -20,6 +21,7 @@ GetOptions(
     man => \$man,
     'copyright=s' => \$copyright,
     'format-spec!' => \$format_spec,
+    'quiet!' => \$quiet,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -28,6 +30,13 @@ Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
 
 if ($format_spec) {
         Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
+}
+
+if (not $quiet) {
+    foreach my $error (Debian::LicenseReconcile::Errors->list) {
+        my @test = split '::', $error->{test};
+        print "$test[$#test]: $error->{msg}\n";
+    }
 }
 
 exit(Debian::LicenseReconcile::Errors->how_many);
@@ -40,7 +49,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>]
 
 =head1 DESCRIPTION
 
@@ -72,3 +81,7 @@ Specify an alternative copyright file. Defaults to C<debian/copyright>.
 
 Don't check the first line of the copyright file against permitted format
 specifications.
+
+=head2 B<--quiet>
+
+Don't give any explanantions, simply a success or a fail via the exit status.
