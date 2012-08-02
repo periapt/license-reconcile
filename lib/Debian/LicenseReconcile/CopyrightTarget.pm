@@ -5,13 +5,12 @@ use strict;
 use warnings;
 use Debian::LicenseReconcile::Errors;
 use Debian::Copyright;
-use Tree::RedBlack;
 
 sub new {
     my $class = shift;
     my $copyright = shift;
 
-    my $self = Tree::RedBlack->new;
+    my $self = {};
     bless $self, $class;
 
     my $parser = Debian::Copyright->new($copyright);
@@ -26,13 +25,33 @@ sub new {
         );
         return;
     }
+    
+    for(my $i=0; $i<$parser->files->Length; $i++) {
+        my $stanza = $parser->files->Values($i);
+        my $key = $stanza->Files;
+        foreach my $pattern (split qr/\s+/, $key) {
+            $self->{$pattern} = $stanza;
+        }
+    }
 
     return $self;
 }
 
+sub get {
+    my $self = shift;
+    my $key = shift;
+    return $self->{$key};
+}
+
+sub keys {
+    my $self = shift;
+    return keys %$self;
+}
+
+
 =head1 NAME
 
-Debian::LicenseReconcile::CopyrightTarget - tree representation of Debian copyright
+Debian::LicenseReconcile::CopyrightTarget - file patterns mapped to Debian copyright
 
 =head1 VERSION
 
@@ -53,12 +72,20 @@ our $VERSION = '0.01';
 
 =head2 new
 
-This constructor returns an L<Tree::RedBlack> object, representing the 
+This constructor returns an object, representing the 
 copyright data. If the copyright data cannot be parsed by L<Debian::Copyright>
-then the constructor returns undef.
+then the constructor returns undef. If successfully parsed the data is
+a mapping from each space-separated part of the C<Files> clauses to the
+L<Debian::Copyright::Stanza::Files> objects.
 
-=cut
+=head2 get
 
+Given a file pattern returns the corresponding object if available
+and otherwise undef.
+
+=head2 keys
+
+Returns a list of file patterns.
 
 =head1 AUTHOR
 

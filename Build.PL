@@ -16,7 +16,6 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => 5.006,
         'Debian::Copyright' => '0.2',
-        'Tree::RedBlack' => 0,
         'File::Slurp' => 0,
     },
     add_to_cleanup      => [ 'Debian-LicenseReconcile-*' ],
