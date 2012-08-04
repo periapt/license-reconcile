@@ -32,10 +32,8 @@ if ($format_spec) {
         Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
 }
 
-Readonly my $COPYRIGHT_TREE
-    => Debian::LicenseReconcile::CopyrightTarget->new($COPYRIGHT_TEXT);
-
-if ($COPYRIGHT_TREE) {
+my $copyright_target => Debian::LicenseReconcile::CopyrightTarget->new;
+if ($copyright_target->parse($COPYRIGHT_TEXT)) {
 }
 
 if (not $quiet) {

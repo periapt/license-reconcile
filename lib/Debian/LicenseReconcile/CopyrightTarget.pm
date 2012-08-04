@@ -5,14 +5,26 @@ use strict;
 use warnings;
 use Debian::LicenseReconcile::Errors;
 use Debian::Copyright;
+use base qw(Tree::Simple);
+use Readonly;
+
+Readonly my $FS_SEPARATOR => '/';
 
 sub new {
     my $class = shift;
-    my $copyright = shift;
+    my $nodeValue = shift;
 
-    my $self = {};
+    my $self = Tree::Simple->new;
+    if ($nodeValue) {
+        $self->setNodeValue($nodeValue);
+    }
     bless $self, $class;
+    return $self;
+}
 
+sub parse {
+    my $self = shift;
+    my $copyright = shift;
     my $parser = Debian::Copyright->new($copyright);
     eval {
         $parser->read(\$copyright);
@@ -30,22 +42,58 @@ sub new {
         my $stanza = $parser->files->Values($i);
         my $key = $stanza->Files;
         foreach my $pattern (split qr/\s+/, $key) {
-            $self->{$pattern} = $stanza;
+            $self->_analyzeClause($pattern, $stanza);
         }
     }
 
     return $self;
 }
 
-sub get {
+sub _analyzeClause {
     my $self = shift;
-    my $key = shift;
-    return $self->{$key};
+    my $pattern = shift;
+    my $stanza = shift;
+    my $tree = $self;
+    foreach my $file (split $FS_SEPARATOR, $pattern) {
+        $tree = $tree->_findOrAddFile($file);
+    }
+    if (exists $tree->getNodeValue->{license} 
+        or exists $tree->getNodeValue->{copyright}) {
+        Debian::LicenseReconcile::Errors->push(
+            test => 'CopyrightParsing',
+            msg => "The file pattern $pattern was defined twice",
+        );
+    }
+    $tree->getNodeValue->{license} = $stanza->License;
+    $tree->getNodeValue->{copyright} = $stanza->Copyright;
 }
 
-sub keys {
+sub _findOrAddFile {
     my $self = shift;
-    return keys %$self;
+    my $file = shift;
+    foreach my $child ($self->getAllChildren) {
+        return $child if $child->getNodeValue->{file} eq $file;
+    }
+    my $child = Debian::LicenseReconcile::CopyrightTarget->new({file=>$file});
+    $self->addChild($child);
+    return $child;
+}
+
+#sub get {
+#    my $self = shift;
+#    my $key = shift;
+#    return $self->{$key};
+#}
+#
+#sub keys {
+#    my $self = shift;
+#    return keys %$self;
+#}
+
+sub directory {
+    my $self = shift;
+    my $directory = shift;
+    return {};
 }
 
 
@@ -74,9 +122,9 @@ our $VERSION = '0.01';
 
 This constructor returns an object, representing the 
 copyright data. If the copyright data cannot be parsed by L<Debian::Copyright>
-then the constructor returns undef. If successfully parsed the data is
-a mapping from each space-separated part of the C<Files> clauses to the
-L<Debian::Copyright::Stanza::Files> objects.
+then the constructor returns undef. If successfully parsed the 
+L<Debian::Copyright::Stanza::Files> data is transformed into a tree
+representation
 
 =head2 get
 
@@ -86,6 +134,12 @@ and otherwise undef.
 =head2 keys
 
 Returns a list of file patterns.
+
+=head2 directory
+
+Takes a directory path and attempts to map the contents of that directory
+onto the copyright specification. It returns a hash reference containing that
+mapping.
 
 =head1 AUTHOR
 

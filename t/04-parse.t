@@ -10,15 +10,13 @@ is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
 my @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [], 'initial state');
 
-my $copyright = Debian::LicenseReconcile::CopyrightTarget->new(scalar read_file('t/data/copyright'));
-isa_ok($copyright, 'Debian::LicenseReconcile::CopyrightTarget', 'good copyright');
-isa_ok($copyright->get('*'), 'Debian::Copyright::Stanza::Files', 'tree not empty');
+my $copyright = Debian::LicenseReconcile::CopyrightTarget->new;
+isa_ok($copyright, 'Debian::LicenseReconcile::CopyrightTarget');
+isa_ok($copyright->parse(scalar read_file('t/data/copyright')),'Debian::LicenseReconcile::CopyrightTarget');
 
 is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [], 'initial state');
 
-my @keys = $copyright->keys;
-cmp_deeply(\@keys, bag( '*', 'lib/Debian/Copyright*'), 'keys');
-
-
+cmp_deeply($copyright->directory('t/data/example'), {
+}, 'directory mapping');
