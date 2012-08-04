@@ -67,8 +67,6 @@ first line?
 
 =item - Can the copyright file be parsed?
 
-=item - Are there any duplicate Files clauses?
-
 =item - Does every file in the source have a uniquely matching Files clause.
 
 =item - Can every file, license and copyright datum extracted from the source be

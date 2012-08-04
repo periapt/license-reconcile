@@ -57,13 +57,6 @@ sub _analyzeClause {
     foreach my $file (split $FS_SEPARATOR, $pattern) {
         $tree = $tree->_findOrAddFile($file);
     }
-    if (exists $tree->getNodeValue->{license} 
-        or exists $tree->getNodeValue->{copyright}) {
-        Debian::LicenseReconcile::Errors->push(
-            test => 'CopyrightParsing',
-            msg => "The file pattern $pattern was defined twice",
-        );
-    }
     $tree->getNodeValue->{license} = $stanza->License;
     $tree->getNodeValue->{copyright} = $stanza->Copyright;
 }
