@@ -79,17 +79,6 @@ sub _findOrAddFile {
     return $child;
 }
 
-#sub get {
-#    my $self = shift;
-#    my $key = shift;
-#    return $self->{$key};
-#}
-#
-#sub keys {
-#    my $self = shift;
-#    return keys %$self;
-#}
-
 sub directory {
     my $self = shift;
     my $directory = shift;
@@ -120,20 +109,18 @@ our $VERSION = '0.01';
 
 =head2 new
 
-This constructor returns an object, representing the 
-copyright data. If the copyright data cannot be parsed by L<Debian::Copyright>
-then the constructor returns undef. If successfully parsed the 
-L<Debian::Copyright::Stanza::Files> data is transformed into a tree
-representation
+This constructor returns an empty tree object. Optionally it takes a
+hash reference node value as an argument. Each node value must
+have a C<file> member representing a file glob at one level in the file system
+hierarchy. If the node actually corresponds to a Files clause, then it
+should also have C<license> and C<copyright> fields.
 
-=head2 get
+=head2 parse
 
-Given a file pattern returns the corresponding object if available
-and otherwise undef.
-
-=head2 keys
-
-Returns a list of file patterns.
+This takes as an argument the copyright data. If the copyright data cannot
+be parsed by L<Debian::Copyright> then the method returns undef. If
+successfully parsed the L<Debian::Copyright::Stanza::Files> data is
+transformed into a tree representation as described under the constructor.
 
 =head2 directory
 
