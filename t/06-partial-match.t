@@ -13,7 +13,7 @@ cmp_deeply(\@list, [], 'initial state');
 my $copyright = Debian::LicenseReconcile::CopyrightTarget->new;
 isa_ok($copyright, 'Debian::LicenseReconcile::CopyrightTarget');
 is($copyright->getChildCount, 0, 'getChildrenCount=0');
-isa_ok($copyright->parse(scalar read_file('t/data/duplicate')),'Debian::LicenseReconcile::CopyrightTarget');
+isa_ok($copyright->parse(scalar read_file('t/data/partial-match')),'Debian::LicenseReconcile::CopyrightTarget');
 is($copyright->getChildCount, 2, 'getChildrenCount=2');
 cmp_deeply($copyright, noclass({
     _children=>[
@@ -41,7 +41,7 @@ cmp_deeply($copyright, noclass({
                             _node=>{
                                 file=>'Copyright*',
                                 license=>re('GPL-2'),
-                                copyright=>re('2009, Damyan Ivanov'),
+                                copyright=>re('2011, Nicholas Bamber'),
                             },
                             _parent=>ignore(),
                             _uid=>ignore(),
@@ -57,6 +57,19 @@ cmp_deeply($copyright, noclass({
                     _uid=>ignore(),
                     _width=>1,
                 },
+                {
+                    _children=>[],
+                    _depth=>1,
+                    _height=>1,
+                    _node=>{
+                        file=>'*',
+                        license=>re('GPL-2'),
+                        copyright=>re('2009, Damyan Ivanov'),
+                    },
+                    _parent=>ignore(),
+                    _uid=>ignore(),
+                    _width=>1,
+                },
             ],
             _depth=>0,
             _height=>3,
@@ -65,7 +78,7 @@ cmp_deeply($copyright, noclass({
             },
             _parent=>ignore(),
             _uid=>ignore(),
-            _width=>1,
+            _width=>2,
         },
     ],
     _depth=>-1,
@@ -73,7 +86,7 @@ cmp_deeply($copyright, noclass({
     _node=>undef,
     _parent=>ignore(),
     _uid=>ignore(),
-    _width=>2,
+    _width=>3,
 }), 'deep structure');
 
 
