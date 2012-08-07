@@ -9,6 +9,7 @@ use base qw(Tree::Simple);
 use Readonly;
 
 Readonly my $FS_SEPARATOR => '/';
+Readonly my $NL => "\n";
 
 sub new {
     my $class = shift;
@@ -78,6 +79,32 @@ sub directory {
     return {};
 }
 
+sub display {
+    my $self = shift;
+    my $result = "";
+    my $node = $self->getNodeValue;
+    if ($node) {
+        $result .= " " x $self->getDepth;
+        $result .= "$node->{file}: ";
+        if (exists $node->{license}) {
+            my @license = split /$NL/, $node->{license};
+            $result .= "$license[0], ";
+        }
+        if (exists $node->{copyright}) {
+            my @copyright = split /$NL/, $node->{copyright};
+            chomp $copyright[0];
+            chomp $copyright[0];
+            $result .= "$copyright[0]...\n";
+        }
+        else {
+            $result .= "\n";
+        }
+    }
+    foreach my $child ($self->getAllChildren) {
+        $result .= $child->display;
+    }
+    return $result;
+}
 
 =head1 NAME
 
@@ -120,6 +147,11 @@ transformed into a tree representation as described under the constructor.
 Takes a directory path and attempts to map the contents of that directory
 onto the copyright specification. It returns a hash reference containing that
 mapping.
+
+=head2 display
+
+Returns a summary representation of the file structure defined by the
+copyright data.
 
 =head1 AUTHOR
 
