@@ -73,10 +73,80 @@ sub _findOrAddFile {
     return $child;
 }
 
-sub directory {
+sub map_directory {
     my $self = shift;
     my $directory = shift;
-    return {};
+    my $ambiguity_list = {};
+    my $file_mapping = {};
+    $self->_recursive_map_directory(
+        $directory,                             # base directory
+        [{directory=>'',tree=>$self}],          # queue
+        $ambiguity_list,
+        $file_mapping, 
+    );
+    $self->_report_ambiguities($ambiguity_list);
+    return $file_mapping;
+}
+
+sub _recursive_map_directory {
+    my $self = shift;
+    my $directory = shift;
+    my $queue = shift;
+    my $ambiguity_list = shift;
+    my $file_mapping = shift;
+
+    # If the queue is empty then we are done.
+    # This is determined by the depth of the file
+    # system since each iteration is each going into 
+    # a new layer of files.
+    return if scalar @{$queue} == 0;
+
+    # This is a mapping from file patterns onto sets of files.
+    # Only the basename of the key may contain wild-carding.
+    # All filenames are relative to $directory.
+    my $local_files = {};
+
+    # An array of pairs (directory, tree). 
+    # The directory is relative to $directory.
+    # Similarly the 'file' part of the node value of the tree
+    # is relative to the directory part.
+    # What this represents is the set of paths from $directory
+    # that still need to be explored.
+    my @new_queue = ();
+
+    # For each child of the tree that has license/copyright info
+    # try to find candidate matches.
+    # This information ($local_files) becomes hard information
+    # such as $file_mapping and $ambiguity_list.
+    # For all children of the tree find directory matches.
+    foreach my $q (@$queue) {
+        $self->_local_glob($directory, $local_files, \@new_queue);
+    }
+
+    # It is inherent in the DEP-5 spec, for one clause to represent
+    # a subset of the other. Granting the subset sole access to
+    # the matching files is how regard the core of the DEP-5 spec.
+    $self->_reduce_supersets($local_files);
+
+    # Now any overlaps between the sets represent unresolvable
+    # ambiguities and must be reported as errors.
+    # Meanwhile we can resolve the ambiguity by marking the
+    # copyright and license as unknown.
+    $self->_find_ambiguities($local_files, $ambiguity_list, $file_mapping);
+
+    # Now $local_files should provide an unambiguous account
+    # of the copyright/license status of each file at this level.
+    # We just need to harvest it.
+    $self->_harvest_mapping($local_files, $file_mapping);
+
+    # down one level
+    $self->_recursive_map_directory(
+        $directory,
+        \@new_queue,
+        $ambiguity_list, 
+        $file_mapping
+    );
+    return;
 }
 
 sub display {
@@ -142,7 +212,7 @@ be parsed by L<Debian::Copyright> then the method returns undef. If
 successfully parsed the L<Debian::Copyright::Stanza::Files> data is
 transformed into a tree representation as described under the constructor.
 
-=head2 directory
+=head2 map_directory
 
 Takes a directory path and attempts to map the contents of that directory
 onto the copyright specification. It returns a hash reference containing that
