@@ -7,6 +7,8 @@ use Debian::LicenseReconcile::Errors;
 use Debian::Copyright;
 use base qw(Tree::Simple);
 use Readonly;
+use Cwd;
+use File::Glob qw(:glob);
 
 Readonly my $FS_SEPARATOR => '/';
 Readonly my $NL => "\n";
@@ -78,19 +80,20 @@ sub map_directory {
     my $directory = shift;
     my $ambiguity_list = {};
     my $file_mapping = {};
+    my $cwd = getcwd;
+    chdir $directory;
     $self->_recursive_map_directory(
-        $directory,                             # base directory
-        [{directory=>'',tree=>$self}],          # queue
+        [{directory=>'./',tree=>$self}],          # queue
         $ambiguity_list,
         $file_mapping, 
     );
     $self->_report_ambiguities($ambiguity_list);
+    return $cwd;
     return $file_mapping;
 }
 
 sub _recursive_map_directory {
     my $self = shift;
-    my $directory = shift;
     my $queue = shift;
     my $ambiguity_list = shift;
     my $file_mapping = shift;
@@ -120,7 +123,7 @@ sub _recursive_map_directory {
     # such as $file_mapping and $ambiguity_list.
     # For all children of the tree find directory matches.
     foreach my $q (@$queue) {
-        $self->_local_glob($directory, $local_files, \@new_queue);
+        $self->_local_glob($q, $local_files, \@new_queue);
     }
 
     # It is inherent in the DEP-5 spec, for one clause to represent
@@ -141,11 +144,29 @@ sub _recursive_map_directory {
 
     # down one level
     $self->_recursive_map_directory(
-        $directory,
         \@new_queue,
         $ambiguity_list, 
         $file_mapping
     );
+    return;
+}
+
+sub _local_glob {
+    my $self = shift;
+    my $old_queue_entry = shift;
+    my $local_files = shift;
+    my $new_queue = shift;
+    my $subdirectory = $old_queue_entry->{directory};
+    my $subtree = $old_queue_entry->{tree};
+    foreach my $child ($subtree->getAllChildren) {
+        my $node = $child->getNodeValue;
+        my $pattern = "${subdirectory}$node->{file}";
+        my @files = bsd_glob($pattern, GLOB_ERR | GLOB_QUOTE | GLOB_MARK);
+        $self->_harvest_directories($new_queue, $child, @files);
+        if (exists $node->{copyright}) {
+            $self->_harvest_copyright($local_files, $node, @files);
+        }
+    }
     return;
 }
 

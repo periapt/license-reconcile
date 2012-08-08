@@ -80,5 +80,5 @@ is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [], 'initial state');
 
-cmp_deeply($copyright->directory('t/data/example'), {
+cmp_deeply($copyright->map_directory('t/data/example'), {
 }, 'directory mapping');
