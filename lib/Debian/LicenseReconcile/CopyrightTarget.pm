@@ -62,6 +62,7 @@ sub _analyzeClause {
     }
     $tree->getNodeValue->{license} = $stanza->License;
     $tree->getNodeValue->{copyright} = $stanza->Copyright;
+    $tree->getNodeValue->{pattern} = $pattern;
 }
 
 sub _findOrAddFile {
@@ -105,8 +106,20 @@ sub _recursive_map_directory {
     return if scalar @{$queue} == 0;
 
     # This is a mapping from file patterns onto sets of files.
-    # Only the basename of the key may contain wild-carding.
-    # All filenames are relative to $directory.
+    # All filenames are relative to $directory and must match the
+    # pattern in the key.
+    # $local_files->{$pattern} = {
+    #    node=>{
+    #           license => $license,
+    #           copyright => $copyright,
+    #           pattern => $pattern,
+    #    },
+    #    files => {
+    #        file1 => 1,
+    #        file2 => 1,
+    #        ......
+    #    }
+    # }
     my $local_files = {};
 
     # An array of pairs (directory, tree). 
@@ -158,7 +171,12 @@ sub _local_glob {
     my $new_queue = shift;
     my $subdirectory = $old_queue_entry->{directory};
     my $subtree = $old_queue_entry->{tree};
+    # TODO: We should be using a new method instead of getAllChildren.
+    # It should return $subtree->getAllChildren plus a virtual child
+    # where appropriate.
+    # We need to handle the case where $subtree is a virtual child.
     foreach my $child ($subtree->getAllChildren) {
+        # TODO: This needs to handle the case where $child is a virtual child.
         my $node = $child->getNodeValue;
         my $pattern = "${subdirectory}$node->{file}";
         my @files = bsd_glob($pattern, GLOB_ERR | GLOB_QUOTE | GLOB_MARK);
@@ -181,6 +199,40 @@ sub _harvest_directories {
             directory => $file,
             tree => $child,
         };
+    }
+    return;
+}
+
+sub _harvest_copyright {
+    my $self = shift;
+    my $local_files = shift;
+    my $node = shift;
+    foreach my $file (@_) {
+        next if $file =~ m{/$};
+        $local_files->{$node->{pattern}}->{files}->{$file} = 1;
+        $local_files->{$node->{pattern}}->{node} = $node;
+    }
+    return;
+}
+
+sub _reduce_supersets {
+    my $self = shift;
+    my $local_files = shift;
+    # TODO
+}
+
+sub _find_ambiguities {
+    # TODO
+}
+
+sub _harvest_mapping {
+    my $self = shift;
+    my $local_files = shift;
+    my $file_mapping = shift;
+    foreach my $pattern (keys %$local_files) {
+        foreach my $file (keys %{$local_files->{$pattern}->{files}}) {
+            $file_mapping->{$file} = $local_files->{$pattern}->{node};
+        }
     }
     return;
 }
