@@ -162,10 +162,25 @@ sub _local_glob {
         my $node = $child->getNodeValue;
         my $pattern = "${subdirectory}$node->{file}";
         my @files = bsd_glob($pattern, GLOB_ERR | GLOB_QUOTE | GLOB_MARK);
-        $self->_harvest_directories($new_queue, $child, @files);
+        $self->_harvest_directories($new_queue, $child, $subdirectory, @files);
         if (exists $node->{copyright}) {
             $self->_harvest_copyright($local_files, $node, @files);
         }
+    }
+    return;
+}
+
+sub _harvest_directories {
+    my $self = shift;
+    my $new_queue = shift;
+    my $child = shift;
+    my $subdirectory = shift;
+    foreach my $file (@_) {
+        next if $file !~ m{/$};
+        push @$new_queue, {
+            directory => $file,
+            tree => $child,
+        };
     }
     return;
 }
