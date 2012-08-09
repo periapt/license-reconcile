@@ -89,7 +89,7 @@ sub map_directory {
         $file_mapping, 
     );
     $self->_report_ambiguities($ambiguity_list);
-    return $cwd;
+    chdir $cwd;
     return $file_mapping;
 }
 
@@ -171,13 +171,8 @@ sub _local_glob {
     my $new_queue = shift;
     my $subdirectory = $old_queue_entry->{directory};
     my $subtree = $old_queue_entry->{tree};
-    # TODO: We should be using a new method instead of getAllChildren.
-    # It should return $subtree->getAllChildren plus a virtual child
-    # where appropriate.
-    # We need to handle the case where $subtree is a virtual child.
-    foreach my $child ($subtree->getAllChildren) {
-        # TODO: This needs to handle the case where $child is a virtual child.
-        my $node = $child->getNodeValue;
+    foreach my $child (_getAllChildrenIncludingGhosts($subtree)) {
+        my $node = (ref $child eq 'HASH') ? $child : $child->getNodeValue;
         my $pattern = "${subdirectory}$node->{file}";
         my @files = bsd_glob($pattern, GLOB_ERR | GLOB_QUOTE | GLOB_MARK);
         $self->_harvest_directories($new_queue, $child, $subdirectory, @files);
@@ -186,6 +181,29 @@ sub _local_glob {
         }
     }
     return;
+}
+
+# We need to handle the case where a Files clause ends in '*'.
+# This means that the same Node details can continue indefinitely
+# down the file system hierarchy. 
+# So we just represent this with that Node value,
+# which happens to be a hash reference.
+sub _getAllChildrenIncludingGhosts {
+    my $tree = shift;
+    return ($tree) if ref $tree eq 'HASH';
+    my @children = $tree->getAllChildren;
+    my $node = $tree->getNodeValue;
+    if ($node and exists $node->{copyright} and $node->{file} =~ m{\*\z}xms) {
+        my $ghost = {
+            copyright => $node->{copyright},
+            license => $node->{license},
+            pattern => $node->{pattern},
+            # The parent may not have had a straight '*'.
+            file => '*',
+        };
+        push @children, $ghost;
+    }
+    return @children;
 }
 
 sub _harvest_directories {
@@ -235,6 +253,10 @@ sub _harvest_mapping {
         }
     }
     return;
+}
+
+sub _report_ambiguities {
+    # TODO
 }
 
 sub display {

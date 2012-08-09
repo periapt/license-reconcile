@@ -25,6 +25,7 @@ cmp_deeply($copyright, noclass({
                 file=>'*',
                 license=>re('Artistic or GPL-2'),
                 copyright=>re('2010-2011, Nicholas Bamber'),
+                pattern=>'*',
             },
             _parent=>ignore(),
             _uid=>ignore(),
@@ -42,6 +43,7 @@ cmp_deeply($copyright, noclass({
                                 file=>'Copyright*',
                                 license=>re('GPL-2'),
                                 copyright=>re('2009, Damyan Ivanov'),
+                                pattern=>'lib/Debian/Copyright*',
                             },
                             _parent=>ignore(),
                             _uid=>ignore(),
@@ -81,5 +83,24 @@ is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [], 'initial state');
 
-cmp_deeply($copyright->directory('t/data/example'), {
+
+my $data = {
+    file=>'*',
+    copyright=>'
+ 2010-2011, Nicholas Bamber <nicholas@periapt.co.uk>',
+    license=>'Artistic or GPL-2+',
+    pattern=>'*',
+};
+cmp_deeply($copyright->map_directory('t/data/example'), {
+    './a/0.h'=>$data,
+    './a/1.h'=>$data,
+    './a/2.h'=>$data,
+    './a/3.h'=>$data,
+    './a/base'=>$data,
+    './a/g/blah'=>$data,
+    './a/g/scriggs.t'=>$data,
+    './a/scriggs.g'=>$data,
+    './base'=>$data,
+    './debian/control'=>$data,
+    './debian/copyright'=>$data,
 }, 'directory mapping');
