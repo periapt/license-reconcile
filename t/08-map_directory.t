@@ -43,6 +43,20 @@ my $data3 = {
     license=>'Artistic or GPL-2+',
     pattern=>'debian/*',
 };
+my $data4 = {
+    file=>'*.g',
+    copyright=>'
+ 2011, Nicholas Bamber <nicholas@periapt.co.uk>
+ 2009, Damyan Ivanov <dmn@debian.org>',
+    license=>'GPL-1+',
+    pattern=>'a/*.g',
+};
+my $data5 = {
+    file=>'*.t',
+    copyright=>$data4->{copyright},
+    license=>$data4->{license},
+    pattern=>'a/g/*.t',
+};
 cmp_deeply($copyright->map_directory('t/data/example'), {
     './a/0.h'=>$data2,
     './a/1.h'=>$data2,
@@ -50,8 +64,8 @@ cmp_deeply($copyright->map_directory('t/data/example'), {
     './a/3.h'=>$data2,
     './a/base'=>$data,
     './a/g/blah'=>$data,
-    './a/g/scriggs.t'=>$data,
-    './a/scriggs.g'=>$data,
+    './a/g/scriggs.t'=>$data5,
+    './a/scriggs.g'=>$data4,
     './base'=>$data,
     './debian/control'=>$data3,
     './debian/copyright'=>$data3,

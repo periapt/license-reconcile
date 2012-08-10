@@ -9,6 +9,7 @@ use base qw(Tree::Simple);
 use Readonly;
 use Cwd;
 use File::Glob qw(:glob);
+use Set::Object;
 
 Readonly my $FS_SEPARATOR => '/';
 Readonly my $NL => "\n";
@@ -114,11 +115,7 @@ sub _recursive_map_directory {
     #           copyright => $copyright,
     #           pattern => $pattern,
     #    },
-    #    files => {
-    #        file1 => 1,
-    #        file2 => 1,
-    #        ......
-    #    }
+    #    files => Set::Object->new(file1, file2, .....),
     # }
     my $local_files = {};
 
@@ -227,8 +224,16 @@ sub _harvest_copyright {
     my $node = shift;
     foreach my $file (@_) {
         next if $file =~ m{/$};
-        $local_files->{$node->{pattern}}->{files}->{$file} = 1;
-        $local_files->{$node->{pattern}}->{node} = $node;
+        if (exists $local_files->{$node->{pattern}}) {
+            $local_files->{$node->{pattern}}->{files}->insert($file);
+        }
+        else {
+            $local_files->{$node->{pattern}} = {
+                files => Set::Object->new($file),
+                node => $node,
+            };
+        }
+            
     }
     return;
 }
@@ -236,10 +241,32 @@ sub _harvest_copyright {
 sub _reduce_supersets {
     my $self = shift;
     my $local_files = shift;
-    # TODO
+
+    # We want to reduce the largest sets first.
+    # TODO: Then if sets are equal the one with more wildcards should be first.
+    # Order matters because it determines what gets removed from.
+    my @keys = sort {
+        $local_files->{$a}->{files}->size <=> $local_files->{$b}->{files}->size
+    } keys %$local_files;
+
+    while (@keys) {
+        my $key = pop @keys;
+        my $key_set = $local_files->{$key}->{files};
+        foreach my $candidate (@keys) {
+            if ($key_set > $local_files->{$candidate}->{files}) {
+                $key_set->remove($local_files->{$candidate}->{files}->members);
+            }
+        }
+    }
+
+    return;
 }
 
 sub _find_ambiguities {
+    my $self = shift;
+    my $local_files = shift;
+    my $ambiguity_list = shift;
+    my $file_mapping = shift;
     # TODO
 }
 
@@ -248,7 +275,7 @@ sub _harvest_mapping {
     my $local_files = shift;
     my $file_mapping = shift;
     foreach my $pattern (keys %$local_files) {
-        foreach my $file (keys %{$local_files->{$pattern}->{files}}) {
+        foreach my $file ($local_files->{$pattern}->{files}->members) {
             $file_mapping->{$file} = $local_files->{$pattern}->{node};
         }
     }
