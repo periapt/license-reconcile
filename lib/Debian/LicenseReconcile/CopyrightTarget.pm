@@ -13,6 +13,13 @@ use Set::Object;
 
 Readonly my $FS_SEPARATOR => '/';
 Readonly my $NL => "\n";
+Readonly my $UNKNOWN => 'UNKNOWN';
+Readonly my $UNKNOWN_NODE => {
+    file => $UNKNOWN,
+    pattern => $UNKNOWN,
+    license => $UNKNOWN,
+    copyright => $UNKNOWN,
+};
 
 sub new {
     my $class = shift;
@@ -242,9 +249,15 @@ sub _reduce_supersets {
     my $self = shift;
     my $local_files = shift;
 
-    # We want to reduce the largest sets first.
-    # TODO: Then if sets are equal the one with more wildcards should be first.
     # Order matters because it determines what gets removed from.
+    # I suppose we should really be comparing two Files clauses
+    # and working out which is the superset in a semantic sense.
+    # However that looks pretty deep. So instead we are using
+    # practical measures.
+    #
+    # We want to reduce the largest sets first.
+    # TODO: Then if sets have equal size
+    # the one with more wildcards should be first.
     my @keys = sort {
         $local_files->{$a}->{files}->size <=> $local_files->{$b}->{files}->size
     } keys %$local_files;
@@ -267,7 +280,50 @@ sub _find_ambiguities {
     my $local_files = shift;
     my $ambiguity_list = shift;
     my $file_mapping = shift;
-    # TODO
+
+    # Here removals will be symmetric so order
+    # should no longer matter.
+    my @keys = keys %$local_files;
+
+    while (@keys) {
+        my $key = pop @keys;
+        my $key_set = $local_files->{$key}->{files};
+        foreach my $candidate (@keys) {
+            my $intersection = $local_files->{$candidate}->{files}*$key_set;
+            if ($intersection->size > 0) {
+                $key_set->remove($intersection->members);
+                $local_files->{$candidate}->{files}->remove($intersection->members);
+                $self->_mapping_ambiguities($file_mapping, $intersection);
+                $self->_process_ambiguities(
+                    $ambiguity_list,
+                    $intersection,
+                    [$key, $candidate],
+                );
+            }
+        }
+    }
+    return;
+}
+
+sub _mapping_ambiguities {
+    my $self = shift;
+    my $file_mapping = shift;
+    my $intersection = shift;
+    foreach my $file ($intersection->members) {
+        $file_mapping->{$file} = $UNKNOWN_NODE;
+    }
+    return;
+}
+
+sub _process_ambiguities {
+    my $self = shift;
+    my $ambiguity_list = shift;
+    my $intersection = shift;
+    my $clashers = shift;
+    foreach my $file ($intersection->members) {
+        $ambiguity_list->{$file} = $clashers;
+    }
+    return;
 }
 
 sub _harvest_mapping {

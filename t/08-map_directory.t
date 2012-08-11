@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::CopyrightTarget;
@@ -57,16 +57,28 @@ my $data5 = {
     license=>$data4->{license},
     pattern=>'a/g/*.t',
 };
+my $dataU = {
+    file=>'UNKNOWN',
+    copyright=>'UNKNOWN',
+    license=>'UNKNOWN',
+    pattern=>'UNKNOWN',
+};
 cmp_deeply($copyright->map_directory('t/data/example'), {
     './a/0.h'=>$data2,
     './a/1.h'=>$data2,
     './a/2.h'=>$data2,
     './a/3.h'=>$data2,
     './a/base'=>$data,
-    './a/g/blah'=>$data,
+    './a/g/blah'=>$dataU,
     './a/g/scriggs.t'=>$data5,
     './a/scriggs.g'=>$data4,
     './base'=>$data,
     './debian/control'=>$data3,
     './debian/copyright'=>$data3,
 }, 'directory mapping');
+
+is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [], 'initial state');
+
+
