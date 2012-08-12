@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
-our @EXPORT = qw(specificity);
+our @EXPORT_OK = qw(specificity);
 
 sub specificity {
     my $s = shift;

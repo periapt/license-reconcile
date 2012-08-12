@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use Test::More tests => 6;
-use Debian::LicenseReconcile::Utils;
+use Debian::LicenseReconcile::Utils qw(specificity);
 
 is(specificity('*'), 0);
 is(specificity('?'), 0);

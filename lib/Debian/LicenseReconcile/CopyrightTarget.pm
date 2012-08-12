@@ -10,6 +10,7 @@ use Readonly;
 use Cwd;
 use File::Glob qw(:glob);
 use Set::Object;
+use Debian::LicenseReconcile::Utils qw(specificity);
 
 Readonly my $FS_SEPARATOR => '/';
 Readonly my $NL => "\n";
@@ -250,17 +251,7 @@ sub _reduce_supersets {
     my $local_files = shift;
 
     # Order matters because it determines what gets removed from.
-    # I suppose we should really be comparing two Files clauses
-    # and working out which is the superset in a semantic sense.
-    # However that looks pretty deep. So instead we are using
-    # practical measures.
-    #
-    # We want to reduce the largest sets first.
-    # TODO: Then if sets have equal size
-    # the one with more wildcards should be first.
-    my @keys = sort {
-        $local_files->{$a}->{files}->size <=> $local_files->{$b}->{files}->size
-    } keys %$local_files;
+    my @keys = sort { specificity($a) <=> specificity($b) } keys %$local_files;
 
     while (@keys) {
         my $key = pop @keys;
