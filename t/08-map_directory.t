@@ -77,8 +77,11 @@ cmp_deeply($copyright->map_directory('t/data/example'), {
     './debian/copyright'=>$data3,
 }, 'directory mapping');
 
-is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
+is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
-cmp_deeply(\@list, [], 'initial state');
+cmp_deeply(\@list, [{
+    test=>'FilesClauseAmbiguity',
+    msg=>'Cannot resolve membership for ./a/g/blah from amongst: *, a/g/*, ',
+}], 'initial state');
 
 

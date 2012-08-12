@@ -339,7 +339,19 @@ sub _harvest_mapping {
 }
 
 sub _report_ambiguities {
-    # TODO
+    my $self = shift;
+    my $ambiguity_list = shift;
+    foreach my $file (keys %$ambiguity_list) {
+        my $msg = "Cannot resolve membership for $file from amongst: ";
+        foreach my $clasher (@{$ambiguity_list->{$file}}) {
+            $msg .= "$clasher, ";
+        }
+        Debian::LicenseReconcile::Errors->push(
+            test => 'FilesClauseAmbiguity',
+            msg => $msg,
+        );
+    }
+    return;
 }
 
 sub display {
