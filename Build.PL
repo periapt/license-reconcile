@@ -16,7 +16,6 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => 5.006,
         'Debian::Copyright' => '0.2',
-        'Tree::Simple' => 0,
         'File::Slurp' => 0,
         'Set::Object' => 0,
     },

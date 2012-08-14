@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use Debian::LicenseReconcile::Errors;
 use Debian::Copyright;
-use base qw(Tree::Simple);
 use Readonly;
 use Cwd;
 use File::Glob qw(:glob);
 use Set::Object;
 use Debian::LicenseReconcile::Utils qw(specificity);
+use File::FnMatch qw(:fnmatch);
+use File::Find;
 
 Readonly my $FS_SEPARATOR => '/';
 Readonly my $NL => "\n";
@@ -24,12 +25,7 @@ Readonly my $UNKNOWN_NODE => {
 
 sub new {
     my $class = shift;
-    my $nodeValue = shift;
-
-    my $self = Tree::Simple->new;
-    if ($nodeValue) {
-        $self->setNodeValue($nodeValue);
-    }
+    my $self = {};
     bless $self, $class;
     return $self;
 }
@@ -49,70 +45,14 @@ sub parse {
         );
         return;
     }
-    
-    for(my $i=0; $i<$parser->files->Length; $i++) {
-        my $stanza = $parser->files->Values($i);
-        my $key = $stanza->Files;
-        foreach my $pattern (split qr/\s+/, $key) {
-            $self->_analyzeClause($pattern, $stanza);
-        }
-    }
-
+    %$self = %{$parser->files};
     return $self;
-}
-
-sub _analyzeClause {
-    my $self = shift;
-    my $pattern = shift;
-    my $stanza = shift;
-    my $tree = $self;
-    foreach my $file (split $FS_SEPARATOR, $pattern) {
-        $tree = $tree->_findOrAddFile($file);
-    }
-    $tree->getNodeValue->{license} = $stanza->License;
-    $tree->getNodeValue->{copyright} = $stanza->Copyright;
-    $tree->getNodeValue->{pattern} = $pattern;
-}
-
-sub _findOrAddFile {
-    my $self = shift;
-    my $file = shift;
-    foreach my $child ($self->getAllChildren) {
-        return $child if $child->getNodeValue->{file} eq $file;
-    }
-    my $child = Debian::LicenseReconcile::CopyrightTarget->new({file=>$file});
-    $self->addChild($child);
-    return $child;
 }
 
 sub map_directory {
     my $self = shift;
     my $directory = shift;
-    my $ambiguity_list = {};
-    my $file_mapping = {};
-    my $cwd = getcwd;
-    chdir $directory;
-    $self->_recursive_map_directory(
-        [{directory=>'./',tree=>$self}],          # queue
-        $ambiguity_list,
-        $file_mapping, 
-    );
-    $self->_report_ambiguities($ambiguity_list);
-    chdir $cwd;
-    return $file_mapping;
-}
-
-sub _recursive_map_directory {
-    my $self = shift;
-    my $queue = shift;
-    my $ambiguity_list = shift;
-    my $file_mapping = shift;
-
-    # If the queue is empty then we are done.
-    # This is determined by the depth of the file
-    # system since each iteration is each going into 
-    # a new layer of files.
-    return if scalar @{$queue} == 0;
+    my $file_mapping = $self->_get_files($directory);
 
     # This is a mapping from file patterns onto sets of files.
     # All filenames are relative to $directory and must match the
@@ -127,21 +67,11 @@ sub _recursive_map_directory {
     # }
     my $local_files = {};
 
-    # An array of pairs (directory, tree). 
-    # The directory is relative to $directory.
-    # Similarly the 'file' part of the node value of the tree
-    # is relative to the directory part.
-    # What this represents is the set of paths from $directory
-    # that still need to be explored.
-    my @new_queue = ();
-
-    # For each child of the tree that has license/copyright info
-    # try to find candidate matches.
+    # For each Files clause try to find candidate matches.
     # This information ($local_files) becomes hard information
-    # such as $file_mapping and $ambiguity_list.
-    # For all children of the tree find directory matches.
-    foreach my $q (@$queue) {
-        $self->_local_glob($q, $local_files, \@new_queue);
+    # such as $file_mapping and ambiguity errors.
+    foreach my $pattern (keys %$self) {
+        $self->_local_glob($pattern, $local_files);
     }
 
     # It is inherent in the DEP-5 spec, for one clause to represent
@@ -153,33 +83,30 @@ sub _recursive_map_directory {
     # ambiguities and must be reported as errors.
     # Meanwhile we can resolve the ambiguity by marking the
     # copyright and license as unknown.
-    $self->_find_ambiguities($local_files, $ambiguity_list, $file_mapping);
+    $self->_find_ambiguities($local_files, $file_mapping);
 
     # Now $local_files should provide an unambiguous account
     # of the copyright/license status of each file at this level.
     # We just need to harvest it.
     $self->_harvest_mapping($local_files, $file_mapping);
 
-    # down one level
-    $self->_recursive_map_directory(
-        \@new_queue,
-        $ambiguity_list, 
-        $file_mapping
-    );
-    return;
+    return $file_mapping;
 }
+
+sub _get_files {
+    my $self = shift;
+    my $directory = shift;
+    my $files = {};
+    find(sub { $files{
+    }, $directory);
+
+
 
 sub _local_glob {
     my $self = shift;
-    my $old_queue_entry = shift;
+    my $pattern = shift;
     my $local_files = shift;
-    my $new_queue = shift;
-    my $subdirectory = $old_queue_entry->{directory};
-    my $subtree = $old_queue_entry->{tree};
-    foreach my $child (_getAllChildrenIncludingGhosts($subtree)) {
-        my $node = (ref $child eq 'HASH') ? $child : $child->getNodeValue;
-        my $pattern = "${subdirectory}$node->{file}";
-        my @files = bsd_glob($pattern, GLOB_ERR | GLOB_QUOTE | GLOB_MARK);
+    my @files = fnmatch($pattern, GLOB_ERR | GLOB_QUOTE | GLOB_MARK);
         $self->_harvest_directories($new_queue, $child, $subdirectory, @files);
         if (exists $node->{copyright}) {
             $self->_harvest_copyright($local_files, $node, @files);

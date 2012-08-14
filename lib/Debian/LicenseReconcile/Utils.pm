@@ -4,8 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 use base qw(Exporter);
+use File::Find;
 
-our @EXPORT_OK = qw(specificity);
+our @EXPORT_OK = qw(specificity get_files);
 
 sub specificity {
     my $s = shift;
@@ -14,9 +15,18 @@ sub specificity {
     return (1.0 * length $t) / length $s;
 }
 
+sub get_files {
+    my $directory = shift;
+    my @files = ();
+    find(sub {
+        push @files, substr($File::Find::name,length($directory)+1) if ! -d $_;
+    }, $directory);
+    return @files;
+}
+
 =head1 NAME
 
-Debian::LicenseReconcile::Utils - measure how specific a Files clause is
+Debian::LicenseReconcile::Utils - various just about describable utilities 
 
 =head1 VERSION
 
@@ -41,6 +51,10 @@ our $VERSION = '0.01';
 
 This method takes a DEP-5 Files clause and returns a number between 0
 and 1 inclusively representing how specific the clause is.
+
+=head2 get_files 
+
+Takes a directory and returns a list of all the files in that directory and below.
 
 =head1 AUTHOR
 
