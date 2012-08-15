@@ -12,7 +12,8 @@ use Debian::LicenseReconcile::CopyrightTarget;
 my $man = 0;
 my $help = 0;
 my $quiet = 0;
-my $display_target = 0;
+my $display_mapping = 0;
+my $directory = ".";
 
 my $copyright = 'debian/copyright';
 
@@ -24,7 +25,8 @@ GetOptions(
     'copyright=s' => \$copyright,
     'format-spec!' => \$format_spec,
     'quiet!' => \$quiet,
-    'display-target!' => \$display_target,
+    'display-mapping!' => \$display_mapping,
+    'directory=s' => \$directory,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -38,8 +40,11 @@ if ($format_spec) {
 my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
 if ($copyright_target->parse($COPYRIGHT_TEXT)) {
 
-    if ($display_target) {
-        print $copyright_target->display;
+    if ($display_mapping) {
+        my $file_mapping = $copyright_target->map_directory($directory);
+        foreach my $file (keys %$file_mapping) {
+            print "$file: $file_mapping->{$file}->{pattern}\n";
+        }
     }
 }
 
@@ -59,7 +64,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-target>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>]
 
 =head1 DESCRIPTION
 
@@ -73,8 +78,6 @@ By default the tests run are as follows:
 first line?
 
 =item - Can the copyright file be parsed?
-
-=item - Does every file in the source have a uniquely matching Files clause.
 
 =item - Can every file, license and copyright datum extracted from the source be
 contained in the corresponding matching paragraph from the copyright file?
@@ -96,7 +99,10 @@ specifications.
 
 Don't give any explanantions, simply a success or a fail via the exit status.
 
-=head2 B<--display-target>
+=head2 B<--display-mapping>
 
-Display the internal representation of the copyright target data.
+Display mapping from the directory onto the copyright clauses.
 
+=head2 B<--directory=>I<directory>
+
+The directory whose copyright and licenses will be verified.
