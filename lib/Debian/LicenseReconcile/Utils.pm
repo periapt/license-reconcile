@@ -6,14 +6,7 @@ use warnings;
 use base qw(Exporter);
 use File::Find;
 
-our @EXPORT_OK = qw(specificity get_files);
-
-sub specificity {
-    my $s = shift;
-    my $t = $s;
-    $t =~ s{(?<!\\)[\*\?]}{}xmsg;
-    return (1.0 * length $t) / length $s;
-}
+our @EXPORT_OK = qw(get_files);
 
 sub get_files {
     my $directory = shift;
@@ -39,18 +32,11 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-    use Debian::LicenseReconcile::Utils;
+    use Debian::LicenseReconcile::Utils qw(get_files);
 
-    if (specificity($pattern1) > specificity($pattern2)) {
-        ....
-    }
+    my @files = get_files($directory);
 
 =head1 SUBROUTINES/METHODS
-
-=head2 specificity
-
-This method takes a DEP-5 Files clause and returns a number between 0
-and 1 inclusively representing how specific the clause is.
 
 =head2 get_files 
 
