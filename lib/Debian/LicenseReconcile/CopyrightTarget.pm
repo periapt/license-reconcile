@@ -6,8 +6,6 @@ use warnings;
 use Debian::LicenseReconcile::Errors;
 use Debian::Copyright;
 use Readonly;
-use Cwd;
-use File::Glob qw(:glob);
 use Debian::LicenseReconcile::Utils qw(get_files);
 use File::FnMatch qw(:fnmatch);
 
@@ -80,24 +78,20 @@ our $VERSION = '0.01';
 
     use Debian::LicenseReconcile::CopyrightTarget;
 
-    my $tree = Debian::LicenseReconcile::CopyrightTarget->new($copyright);
+    my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
+    $copyright_target->parse($text);
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-This constructor returns an empty tree object. Optionally it takes a
-hash reference node value as an argument. Each node value must
-have a C<file> member representing a file glob at one level in the file system
-hierarchy. If the node actually corresponds to a Files clause, then it
-should also have C<license> and C<copyright> fields.
+This constructor returns an empty copyright target object. 
 
 =head2 parse
 
 This takes as an argument the copyright data. If the copyright data cannot
-be parsed by L<Debian::Copyright> then the method returns undef. If
-successfully parsed the L<Debian::Copyright::Stanza::Files> data is
-transformed into a tree representation as described under the constructor.
+be parsed by L<Debian::Copyright> then the method returns undef and
+reports an error via L<Debian::LicenseReconcile::Errors>.
 
 =head2 map_directory
 
