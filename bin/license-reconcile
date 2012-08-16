@@ -8,12 +8,15 @@ use Readonly;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::FormatSpec;
 use Debian::LicenseReconcile::CopyrightTarget;
+use Debian::LicenseReconcile;
+use UNIVERSAL::require;
 
 my $man = 0;
 my $help = 0;
 my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
+my @filters = ();
 
 my $copyright = 'debian/copyright';
 
@@ -40,12 +43,28 @@ if ($format_spec) {
 my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
 if ($copyright_target->parse($COPYRIGHT_TEXT)) {
 
+    my $file_mapping = $copyright_target->map_directory($directory);
+
     if ($display_mapping) {
-        my $file_mapping = $copyright_target->map_directory($directory);
         foreach my $file (keys %$file_mapping) {
             print "$file: $file_mapping->{$file}->{pattern}\n";
         }
     }
+
+    my $reconcile = Debian::LicenseReconcile->new;
+    foreach my $filter_name (@filters) {
+        my $class = "Debian::LicenseReocncile::Filter::$filter_name";
+        $class->require;
+        my $test = $class->new(
+            $directory=>$directory,
+        );
+        my @info = $test->get_info;
+        foreach my $titbit (@info) {
+            # TODO need to check filemapping knows about the fuke
+            $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
+        }
+    }
+
 }
 
 if (not $quiet) {
