@@ -16,7 +16,7 @@ my $help = 0;
 my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
-my @filters = ();
+my @filters = qw(Default);
 
 my $copyright = 'debian/copyright';
 
@@ -53,15 +53,22 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
 
     my $reconcile = Debian::LicenseReconcile->new;
     foreach my $filter_name (@filters) {
-        my $class = "Debian::LicenseReocncile::Filter::$filter_name";
+        my $class = "Debian::LicenseReconcile::Filter::$filter_name";
         $class->require;
         my $test = $class->new(
-            $directory=>$directory,
+            directory=>$directory,
         );
         my @info = $test->get_info;
         foreach my $titbit (@info) {
-            # TODO need to check filemapping knows about the fuke
-            $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
+            if (exists $file_mapping->{$titbit->{file}}) {
+                $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
+            }
+            else {
+                Debian::LicenseReconcile::Errors->push(
+                    test => 'File mismatch',
+                    msg => "Filter $filter_name found $titbit->{file} which was not in the file mapping. This probably implies a bug in the filter.",
+                );
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 #!perl 
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Compile;
 
 BEGIN {
@@ -10,6 +10,7 @@ BEGIN {
     use_ok( 'Debian::LicenseReconcile::CopyrightTarget' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::Utils' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::Filter' ) || print "Bail out!\n";
+    use_ok( 'Debian::LicenseReconcile::Filter::Default' ) || print "Bail out!\n";
 }
 
 diag( "Testing Debian::LicenseReconcile $Debian::LicenseReconcile::VERSION, Perl $], $^X" );
