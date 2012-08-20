@@ -7,21 +7,41 @@ use base qw(Debian::LicenseReconcile::Filter);
 use Debian::LicenseReconcile::Errors;
 use Readonly;
 use System::Command;
+use File::Slurp;
 
 Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--copyright', '--recursive');
+
+Readonly my $PARSE_RE => qr{
+    ^                           # beginning of line
+    ([^\n:]+)                   # file name
+    :\s+                        # separator
+    ([^\n]+)                    # license
+    \s*                         # just in case
+    $                           # end of line
+    \s*                         # just in case
+    ([^\n]+)                    # copyright notice
+    \s*                         # just in case
+    $                           # end of line
+    \s*                         # just in case
+}xms;
+
+Readonly my $TEST_NAME => 'Default';
 
 sub get_info {
     my $self = shift;
     my ( $pid, $in, $out, $err ) = System::Command->spawn(@SCRIPT, $self->{directory});
-    my @msg = <$err>;
-    if (@msg) {
-        Debian::LicenseReconcile::Errors->push(
-            test => 'Default',
-            msg => "@msg",
-        );
+    close $in;
+    my $output = read_file $out;
+    my @results;
+    while ($output =~ /$PARSE_RE/gc) {
+        push @results, {
+            file => $1,
+            license => $2,
+            copyright => $3,
+            test => $TEST_NAME,
+        };
     }
-    my @out = <$out>;
-    return [];
+    return @results;
 }
 
 =head1 NAME

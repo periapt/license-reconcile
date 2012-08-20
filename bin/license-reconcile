@@ -58,8 +58,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
         my $test = $class->new(
             directory=>$directory,
         );
-        my @info = $test->get_info;
-        foreach my $titbit (@info) {
+        foreach my $titbit ($test->get_info) {
             if (exists $file_mapping->{$titbit->{file}}) {
                 $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
             }
