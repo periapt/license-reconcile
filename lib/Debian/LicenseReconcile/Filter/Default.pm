@@ -34,10 +34,13 @@ sub get_info {
     my $output = read_file $out;
     my @results;
     while ($output =~ /$PARSE_RE/gc) {
+        my $file = substr($1, 1+length $self->{directory});
+        my $license = $2;
+        my $copyright = $3;
         push @results, {
-            file => $1,
-            license => $2,
-            copyright => $3,
+            file => $file,
+            license => $license,
+            copyright => $copyright,
             test => $TEST_NAME,
         };
     }
