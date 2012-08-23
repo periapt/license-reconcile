@@ -56,7 +56,14 @@ our $VERSION = '0.01';
 
 =head2 new
 
+A constructor with no flexibility needed.
+
 =head2 check
+
+This method takes two arguments, firstly a hash obtained from the source code
+under inspection and the second from the copyright file. Currently only
+the C<license> field is checked. This field from the first hash must exactly
+match the first line of the license field from the second.
 
 =head1 AUTHOR
 

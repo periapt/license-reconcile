@@ -94,7 +94,9 @@ our $VERSION = '0.01';
 =head2 get_info
 
 Returns a list of hash references describing copyright and license information
-that should be checked against the copyright target.
+that should be checked against the copyright target. The results returned
+from this filter are those that are obtained from
+C<licensecheck --no-conf --recursive --copyright DIR>.
 
 =head1 AUTHOR
 

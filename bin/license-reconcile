@@ -92,7 +92,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--default-license=>I<spec>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>]
 
 =head1 DESCRIPTION
 
@@ -109,6 +109,8 @@ first line?
 
 =item - Can every file, license and copyright datum extracted from the source be
 contained in the corresponding matching paragraph from the copyright file?
+The data for this comparison comes from a number filter objects. See L</Filters>
+for more information.
 
 =back
 
@@ -135,3 +137,41 @@ Display mapping from the directory onto the copyright clauses.
 
 The directory whose copyright and licenses will be verified.
 
+=head1 Filters
+
+By default the filters are processed in the order below. Once a file has been
+returned by a filter, subsequent filters will ignore it.
+
+=over
+
+=item - L<Rules|Debian::LicenseReconcile::Filter::Rules>
+
+=item - L<Std|Debian::LicenseReconcile::Filter::Std>
+
+=item - L<Shebang|Debian::LicenseReconcile::Filter::Shebang>
+
+=item - L<ChangeLog|Debian::LicenseReconcile::Filter::ChangeLog>
+
+=item - L<Default|Debian::LicenseReconcile::Filter::Default>
+
+=back
+
+=head1 LIMITATIONS
+
+Currently I am ignoring the copyright data and concentrating on the license data.
+
+=head1 AUTHOR
+
+Nicholas Bamber, C<< <nicholas at periapt.co.uk> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Nicholas Bamber.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
