@@ -89,7 +89,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--default-license=>I<spec>]
 
 =head1 DESCRIPTION
 
@@ -131,3 +131,4 @@ Display mapping from the directory onto the copyright clauses.
 =head2 B<--directory=>I<directory>
 
 The directory whose copyright and licenses will be verified.
+

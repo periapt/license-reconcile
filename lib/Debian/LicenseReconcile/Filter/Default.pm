@@ -9,7 +9,15 @@ use Readonly;
 use System::Command;
 use File::Slurp;
 
-Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--copyright', '--recursive');
+Readonly my %LICENSE_MAPPING => (
+    'GPL-2' => 'GPL-2',
+    'GPL (v2)' => 'GPL-2',
+    'GPL (v2 or later)' => 'GPL-2+',
+    'LGPL (v2)' => 'LGPL',
+    'zlib/libpng' => 'zlib/libpng',
+);
+
+Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf', '--copyright', '--recursive');
 
 Readonly my $PARSE_RE => qr{
     ^                           # beginning of line
@@ -33,9 +41,10 @@ sub get_info {
     close $in;
     my $output = read_file $out;
     my @results;
-    while ($output =~ /$PARSE_RE/gc) {
+    while ($output =~ /$PARSE_RE/g) {
         my $file = substr($1, 1+length $self->{directory});
-        my $license = $2;
+        my $license = $self->_cleanup_license($2);
+        next if not $license;
         my $copyright = $3;
         push @results, {
             file => $file,
@@ -45,6 +54,19 @@ sub get_info {
         };
     }
     return @results;
+}
+
+sub _cleanup_license {
+    my $self = shift;
+    my $license = shift;
+    $license =~ s{\*No\s+copyright\*}{}xms;
+    $license =~ s{GENERATED\s+FILE}{}xms;
+    $license =~ s{^\s+}{}xms;
+    $license =~ s{\s+$}{}xms;
+    $license =~ s{\s+\(with\s+incorrect\s+FSF\s+address\)}{}xms;
+    return $LICENSE_MAPPING{$license} if exists $LICENSE_MAPPING{$license};
+    return if $license eq 'UNKNOWN';
+    return $license;
 }
 
 =head1 NAME

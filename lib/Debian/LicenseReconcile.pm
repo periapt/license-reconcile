@@ -3,6 +3,7 @@ package Debian::LicenseReconcile;
 use 5.006;
 use strict;
 use warnings;
+use Debian::LicenseReconcile::Errors;
 
 sub new {
     my $class = shift;
@@ -12,6 +13,23 @@ sub new {
 }
 
 sub check {
+    my $self = shift;
+    my $subject = shift;
+    my $target = shift;
+    my $license = $subject->{license};
+
+    if ($license) {
+        my $target_license = $target->{license};
+        $target_license =~ s{\n.*\z}{}xms;
+        if ($license ne $target_license) {
+            my $msg = "File $subject->{file} has license $license which does not match $target_license.";
+            Debian::LicenseReconcile::Errors->push(
+                test => 'License mismatch',
+                msg => $msg,
+            );
+        }
+    }
+    return;
 }
 
 =head1 NAME
