@@ -1,4 +1,4 @@
-package Debian::LicenseReconcile::Filter::Default;
+package Debian::LicenseReconcile::Filter::Std;
 
 use 5.006;
 use strict;
@@ -33,7 +33,7 @@ Readonly my $PARSE_RE => qr{
     \s*                         # just in case
 }xms;
 
-Readonly my $TEST_NAME => 'Default';
+Readonly my $TEST_NAME => 'Std';
 
 sub get_info {
     my $self = shift;
@@ -71,7 +71,7 @@ sub _cleanup_license {
 
 =head1 NAME
 
-Debian::LicenseReconcile::Filter::Default - applies licensecheck to get data
+Debian::LicenseReconcile::Filter::Std - applies licensecheck to get data
 
 =head1 VERSION
 
@@ -84,9 +84,9 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-    use Debian::LicenseReconcile::Filter::Default;
+    use Debian::LicenseReconcile::Filter::Std;
 
-    my $filter = Debian::LicenseReconcile::Filter::Default->new(directory=>'.');
+    my $filter = Debian::LicenseReconcile::Filter::Std->new(directory=>'.');
     my @info = $filter->get_info(@files);
 
 =head1 SUBROUTINES/METHODS

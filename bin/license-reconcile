@@ -16,7 +16,7 @@ my $help = 0;
 my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
-my @filters = qw(Default);
+my @filters = qw(Std);
 
 my $copyright = 'debian/copyright';
 
@@ -52,6 +52,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
     }
 
     my $reconcile = Debian::LicenseReconcile->new;
+    my %file_checked = ();
     foreach my $filter_name (@filters) {
         my $class = "Debian::LicenseReconcile::Filter::$filter_name";
         $class->require;
@@ -59,6 +60,8 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
             directory=>$directory,
         );
         foreach my $titbit ($test->get_info) {
+            next if $file_checked{$titbit->{file}};
+            $file_checked{$titbit->{file}} = 1;
             if (exists $file_mapping->{$titbit->{file}}) {
                 $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
             }
