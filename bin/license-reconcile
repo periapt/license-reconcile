@@ -9,6 +9,7 @@ use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::FormatSpec;
 use Debian::LicenseReconcile::CopyrightTarget;
 use Debian::LicenseReconcile;
+use Parse::DebianChangelog;
 use UNIVERSAL::require;
 use Config::Any;
 
@@ -18,7 +19,8 @@ my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
 my @filters = qw(Rules Std Shebang ChangeLog Default);
-my $config_file = 'debian/license-reconcile';
+my $config_file = 'debian/license-reconcile.yml';
+my $changelog_file = 'debian/changelog';
 
 my $copyright = 'debian/copyright';
 
@@ -33,12 +35,15 @@ GetOptions(
     'display-mapping!' => \$display_mapping,
     'directory=s' => \$directory,
     'config-file=s' => \$config_file,
+    'changelog-file=s' => \$changelog_file,
     'filters=s{,}' => \@filters,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
+
+Readonly my $CHANGELOG => Parse::DebianChangelog->init({infile=>$changelog_file});
 
 if ($format_spec) {
         Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
@@ -71,6 +76,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
             directory=>$directory,
             files_remaining=>\@files_remaining,
             config=>$CONFIG->{$filter_name},
+            changelog=>$CHANGELOG,
         );
         foreach my $titbit ($test->get_info) {
             next if $file_checked{$titbit->{file}};
@@ -105,7 +111,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--filters=>I<module1 module2 ...>] [B<--config-file=>I<file>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--filters=>I<module1 module2 ...>] [B<--config-file=>I<file>] [B<--changelog-file=>I<file>]
 
 =head1 DESCRIPTION
 
@@ -168,6 +174,12 @@ A file used to provide filter specific configuration data. The file is read
 by L<Config::Any> and the relevant section is passed to each filter constructor
 via the C<config> parameter.
 
+=head2 <--changelog-file=>I<file>
+
+The Debian changelog file which defaults to C<debian/changelog>. The Rules filter
+uses this to get the current version and the ChangeLog filter gets its data
+from it.
+
 =head1 Filters
 
 By default the filters are processed in the order below. Once a file has been
@@ -198,11 +210,18 @@ Each filter constructor will be passed the following parameters:
 =item - config - a data structure representing the portion of the config file
 relevant to this filter.
 
+=item - changelog - a L<Parse::DebianChangelog> object.
+
 =back
 
 =head1 LIMITATIONS
 
 Currently I am ignoring the copyright data and concentrating on the license data.
+
+Also the DEP-5 specification is subtly different from the file glob specification.
+Since the L<File::FnMatch> module is the only practical implementation there
+is little that can be done. The consequence is that file names including
+square brackets are unlikely to be handled correctly.
 
 =head1 AUTHOR
 
