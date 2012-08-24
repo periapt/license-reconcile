@@ -6,67 +6,13 @@ use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
 use Debian::LicenseReconcile::Errors;
 use Readonly;
-use System::Command;
 use File::Slurp;
-
-Readonly my %LICENSE_MAPPING => (
-    'GPL-2' => 'GPL-2',
-    'GPL (v2)' => 'GPL-2',
-    'GPL (v2 or later)' => 'GPL-2+',
-    'LGPL (v2)' => 'LGPL',
-    'zlib/libpng' => 'zlib/libpng',
-);
-
-Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf', '--copyright', '--recursive');
-
-Readonly my $PARSE_RE => qr{
-    ^                           # beginning of line
-    ([^\n:]+)                   # file name
-    :\s+                        # separator
-    ([^\n]+)                    # license
-    \s*                         # just in case
-    $                           # end of line
-    \s*                         # just in case
-    ([^\n]+)                    # copyright notice
-    \s*                         # just in case
-    $                           # end of line
-    \s*                         # just in case
-}xms;
 
 Readonly my $TEST_NAME => 'Rules';
 
 sub get_info {
     my $self = shift;
-    my ( $pid, $in, $out, $err ) = System::Command->spawn(@SCRIPT, $self->{directory});
-    close $in;
-    my $output = read_file $out;
-    my @results;
-    while ($output =~ /$PARSE_RE/g) {
-        my $file = substr($1, 1+length $self->{directory});
-        my $license = $self->_cleanup_license($2);
-        next if not $license;
-        my $copyright = $3;
-        push @results, {
-            file => $file,
-            license => $license,
-            copyright => $copyright,
-            test => $TEST_NAME,
-        };
-    }
-    return @results;
-}
-
-sub _cleanup_license {
-    my $self = shift;
-    my $license = shift;
-    $license =~ s{\*No\s+copyright\*}{}xms;
-    $license =~ s{GENERATED\s+FILE}{}xms;
-    $license =~ s{^\s+}{}xms;
-    $license =~ s{\s+$}{}xms;
-    $license =~ s{\s+\(with\s+incorrect\s+FSF\s+address\)}{}xms;
-    return $LICENSE_MAPPING{$license} if exists $LICENSE_MAPPING{$license};
-    return if $license eq 'UNKNOWN';
-    return $license;
+    return [];
 }
 
 =head1 NAME
@@ -86,7 +32,11 @@ our $VERSION = '0.01';
 
     use Debian::LicenseReconcile::Filter::Rules;
 
-    my $filter = Debian::LicenseReconcile::Filter::Rules->new(directory=>'.');
+    my $filter = Debian::LicenseReconcile::Filter::Rules->new(
+        directory=>'.',
+        files_remaining=>[....],
+        config=>[....],
+    );
     my @info = $filter->get_info(@files);
 
 =head1 SUBROUTINES/METHODS
@@ -95,8 +45,36 @@ our $VERSION = '0.01';
 
 Returns a list of hash references describing copyright and license information
 that should be checked against the copyright target. The results returned
-from this filter are those that are obtained from
-C<licensecheck --no-conf --recursive --copyright DIR>.
+are those obtained by applying the rules in the config file in sequence.
+Each rule might have the following fields:
+
+=over
+
+=item - Pattern (optional) - a file glob to limit which files the rule applies to.
+
+=item - Contains (optional) - a piece of text which the file must contain for the
+rule to apply.
+
+=item - Matches (optional) - an extended regular expression which the file contents
+must match for the rule to apply.
+
+=item - MMagic (optional) - a string which must equal the magic value obtained from
+L<File::MMagic> for the rule to apply.
+
+=item - MaxVersion (optional) - an upstream version string after which the rule will
+not be applied. This is recommended unless you are certain that the rule is robust
+so that the rule will be regularly reviewed.
+
+=item - Comment (optional) - free text documentation concerning the rule. This might
+include the reasons for the rule as well as any Debian or upstream bug reports
+relating to the rule.
+
+=item - License (mandatory) - the short form of the license.
+
+=item - Copyright (mandatory) - the copyright data in the same format as the
+C<debian/copyright> file.
+
+=back
 
 =head1 AUTHOR
 

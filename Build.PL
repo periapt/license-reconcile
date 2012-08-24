@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
         'Debian::Copyright' => '0.2',
         'File::Slurp' => 0,
         'Config::Any' => 0,
+        'File::MMagic' => 0,
     },
     add_to_cleanup      => [ 'Debian-LicenseReconcile-*' ],
     create_makefile_pl => 'traditional',
