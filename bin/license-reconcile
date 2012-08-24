@@ -10,13 +10,15 @@ use Debian::LicenseReconcile::FormatSpec;
 use Debian::LicenseReconcile::CopyrightTarget;
 use Debian::LicenseReconcile;
 use UNIVERSAL::require;
+use Config::Any;
 
 my $man = 0;
 my $help = 0;
 my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
-my @filters = qw(Std);
+my @filters = qw(Rules Std Shebang ChangeLog Default);
+my $config_file = 'debian/license-reconcile';
 
 my $copyright = 'debian/copyright';
 
@@ -30,6 +32,8 @@ GetOptions(
     'quiet!' => \$quiet,
     'display-mapping!' => \$display_mapping,
     'directory=s' => \$directory,
+    'config-file=s' => \$config_file,
+    'filters=s{,}' => \@filters,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -39,6 +43,12 @@ Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
 if ($format_spec) {
         Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
 }
+
+Readonly my $CONFIG => Config::Any->load_files({
+    files=>[$config_file],
+    use_ext=>1,
+    flatten_to_hash=>1,
+})->{$config_file};
 
 my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
 if ($copyright_target->parse($COPYRIGHT_TEXT)) {
@@ -56,8 +66,11 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
     foreach my $filter_name (@filters) {
         my $class = "Debian::LicenseReconcile::Filter::$filter_name";
         $class->require;
+        my @files_remaining = grep {not exists $file_checked{$_}} keys %$file_mapping;
         my $test = $class->new(
             directory=>$directory,
+            files_remaining=>\@files_remaining,
+            config=>$CONFIG->{$filter_name},
         );
         foreach my $titbit ($test->get_info) {
             next if $file_checked{$titbit->{file}};
@@ -92,12 +105,17 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>]
+B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--filters=>I<module1 module2 ...>] [B<--config-file=>I<file>]
 
 =head1 DESCRIPTION
 
 B<license-reconcile> attempts to match license and copyright information
 in a directory with the information available in C<debian/copyright>.
+It gets most of its data from C<licensecheck> so should produce something
+worth looking at out of the box.
+However for a given package it can be configured to succeed in a known good
+state, so that if on subsequent upstream updates it fails, it points out
+what needs looking at.
 By default the tests run are as follows:
 
 =over
@@ -127,7 +145,7 @@ specifications.
 
 =head2 B<--quiet>
 
-Don't give any explanantions, simply a success or a fail via the exit status.
+Don't give any explanations, simply a success or a fail via the exit status.
 
 =head2 B<--display-mapping>
 
@@ -135,7 +153,20 @@ Display mapping from the directory onto the copyright clauses.
 
 =head2 B<--directory=>I<directory>
 
-The directory whose copyright and licenses will be verified.
+The directory whose copyright and licenses will be verified. This defaults to ".".
+
+=head2 B<--filters=>I<module1 module2 ....>
+
+A sequence of filters which will inspect the source package and return
+license and copyright information. Each module name must sit below the
+L<Debian::LicenseReconcile::Filter> and inherit from it. The default value 
+is "Rules Std Shebang ChangeLog Default".
+
+=head2 B<--config-file=>I<file>
+
+A file used to provide filter specific configuration data. The file is read
+by L<Config::Any> and the relevant section is passed to each filter constructor
+via the C<config> parameter.
 
 =head1 Filters
 
@@ -153,6 +184,19 @@ returned by a filter, subsequent filters will ignore it.
 =item - L<ChangeLog|Debian::LicenseReconcile::Filter::ChangeLog>
 
 =item - L<Default|Debian::LicenseReconcile::Filter::Default>
+
+=back
+
+Each filter constructor will be passed the following parameters:
+
+=over
+
+=item - directory - the directory from which to find license and copyright data.
+
+=item - files_remaining - an array ref of files which have not been analyzed.
+
+=item - config - a data structure representing the portion of the config file
+relevant to this filter.
 
 =back
 
