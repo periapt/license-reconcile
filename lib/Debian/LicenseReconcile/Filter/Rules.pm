@@ -12,7 +12,17 @@ Readonly my $TEST_NAME => 'Rules';
 
 sub get_info {
     my $self = shift;
-    return;
+    my @results;
+
+    foreach my $file (@{$self->files_remaining}) {
+        push @results, {
+            file=>$file,
+            copyright=>$self->config->{rules}->[0]->{Copyright},
+            license=>$self->config->{rules}->[0]->{License},
+            test=>$TEST_NAME,
+        };
+    }
+    return @results;
 }
 
 =head1 NAME
