@@ -15,14 +15,31 @@ sub get_info {
     my @results;
 
     foreach my $file (@{$self->files_remaining}) {
+        my $rule = $self->_find_rule($file);
         push @results, {
             file=>$file,
-            copyright=>$self->config->{rules}->[0]->{Copyright},
-            license=>$self->config->{rules}->[0]->{License},
+            copyright=>$rule->{Copyright},
+            license=>$rule->{License},
             test=>$TEST_NAME,
         };
     }
     return @results;
+}
+
+sub _find_rule {
+    my $self = shift;
+    my $file = shift;
+    my @rules = @{$self->config->{rules}};
+    my $matching_rule = undef;
+    foreach my $rule (@rules) {
+
+        # Run through the test clauses
+
+        # Now we've found a matching rule
+        $matching_rule = $rule;
+        return $rule;
+    }
+    return;
 }
 
 =head1 NAME
