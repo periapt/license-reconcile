@@ -7,6 +7,7 @@ use Test::Deep;
 my @files = get_files('t/data/example');
 cmp_deeply(\@files, [
 	'base',
+	'base.h',
 	'a/base',
 	'a/2.h',
 	'a/0.h',

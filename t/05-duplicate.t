@@ -34,7 +34,9 @@ cmp_deeply($copyright->map_directory('t/data/example'), {
     'a/g/blah'=>$data,
     'a/g/scriggs.t'=>$data,
     'a/scriggs.g'=>$data,
+    'a/base'=>$data,
     'base'=>$data,
+    'base.h'=>$data,
     'debian/control'=>$data,
     'debian/copyright'=>$data,
 }, 'directory mapping');
