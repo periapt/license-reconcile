@@ -19,6 +19,7 @@ my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
 my @filters = qw(Rules Std Shebang ChangeLog Default);
+my @filters_override = ();
 my $config_file = 'debian/license-reconcile.yml';
 my $changelog_file = 'debian/changelog';
 
@@ -36,10 +37,21 @@ GetOptions(
     'directory=s' => \$directory,
     'config-file=s' => \$config_file,
     'changelog-file=s' => \$changelog_file,
-    'filters=s{,}' => \@filters,
+#    'filters=s' => \@filters,
+    'filters=s@' => sub {
+        shift; # name of option
+        my $value = shift;
+        if (not grep {$value eq $_} @filters_override) {
+            push @filters_override, $value;
+        }
+    },
 ) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (@filters_override) {
+    @filters = @filters_override;
+}
 
 Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
 

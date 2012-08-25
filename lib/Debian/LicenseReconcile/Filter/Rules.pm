@@ -12,7 +12,7 @@ Readonly my $TEST_NAME => 'Rules';
 
 sub get_info {
     my $self = shift;
-    return [];
+    return;
 }
 
 =head1 NAME

@@ -3,13 +3,15 @@ package Debian::LicenseReconcile::Filter;
 use 5.006;
 use strict;
 use warnings;
-
-sub new {
-    my $class = shift;
-    my %self = @_;
-    bless \%self, $class;
-    return \%self;
-}
+use Class::XSAccessor
+    constructor => 'new',
+    getters => {
+        directory => 'directory',
+        files_remaining => 'files_remaining',
+        changelog => 'changelog',
+        config => 'config',
+    },
+;
 
 sub get_info {
     my $self = shift;
@@ -47,6 +49,22 @@ object.
 
 Returns a list of hash references describing copyright and license information
 that should be checked against the copyright target.
+
+=head2 directory
+
+Returns the search directory as set in the constructor.
+
+=head2 files_remaining
+
+Returns the files to be checked as set in the constructor.
+
+=head2 changelog
+
+Returns the L<Parse::DebianChangelog> as set in the constructor.
+
+=head2 config
+
+Returns the config data as set in the constructor.
 
 =head1 AUTHOR
 

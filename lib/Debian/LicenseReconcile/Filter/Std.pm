@@ -42,7 +42,7 @@ sub get_info {
     my $output = read_file $out;
     my @results;
     while ($output =~ /$PARSE_RE/g) {
-        my $file = substr($1, 1+length $self->{directory});
+        my $file = substr($1, 1+length $self->directory);
         my $license = $self->_cleanup_license($2);
         next if not $license;
         my $copyright = $3;
