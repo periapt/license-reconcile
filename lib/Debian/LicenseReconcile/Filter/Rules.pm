@@ -35,8 +35,12 @@ sub _find_rule {
     foreach my $rule (@rules) {
 
         # Run through the test clauses
-        if (exists $rule->{Pattern}) {
-            next if not fnmatch($rule->{Pattern}, $file);
+        if (exists $rule->{Glob}) {
+            next if not fnmatch($rule->{Glob}, $file);
+        }
+        my $contents = read_file($self->directory."/$file");
+        if (exists $rule->{Contains}) {
+            next if -1 == index $contents, $rule->{Contains};
         }
             
 
@@ -82,7 +86,7 @@ Each rule might have the following fields:
 
 =over
 
-=item - Pattern (optional) - a file glob to limit which files the rule applies to.
+=item - Glob (optional) - a file glob to limit which files the rule applies to.
 
 =item - Contains (optional) - a piece of text which the file must contain for the
 rule to apply.
