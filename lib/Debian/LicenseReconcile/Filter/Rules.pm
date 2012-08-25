@@ -4,9 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
-use Debian::LicenseReconcile::Errors;
 use Readonly;
 use File::Slurp;
+use File::FnMatch qw(:fnmatch);
 
 Readonly my $TEST_NAME => 'Rules';
 
@@ -16,6 +16,7 @@ sub get_info {
 
     foreach my $file (@{$self->files_remaining}) {
         my $rule = $self->_find_rule($file);
+        next if not $rule;
         push @results, {
             file=>$file,
             copyright=>$rule->{Copyright},
@@ -34,6 +35,10 @@ sub _find_rule {
     foreach my $rule (@rules) {
 
         # Run through the test clauses
+        if (exists $rule->{Pattern}) {
+            next if not fnmatch($rule->{Pattern}, $file);
+        }
+            
 
         # Now we've found a matching rule
         $matching_rule = $rule;
