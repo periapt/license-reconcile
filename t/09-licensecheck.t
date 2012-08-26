@@ -15,5 +15,5 @@ cmp_deeply(\@data, [{
     file=>'base.h',
     license=>'GPL-2',
     test=>'Std',
-    copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
+    copyright=>'[Copyright: 2011, Periapt Technologies. All rights reserved]',
 }]);
