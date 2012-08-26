@@ -7,8 +7,10 @@ use base qw(Debian::LicenseReconcile::Filter);
 use Readonly;
 use File::Slurp;
 use File::FnMatch qw(:fnmatch);
+use File::MMagic;
 
 Readonly my $TEST_NAME => 'Rules';
+Readonly my $MMAGIC => File::MMagic->new('/etc/magic');
 
 sub get_info {
     my $self = shift;
@@ -41,6 +43,10 @@ sub _find_rule {
         my $contents = read_file($self->directory."/$file");
         if (exists $rule->{Contains}) {
             next if -1 == index $contents, $rule->{Contains};
+        }
+        if (exists $rule->{MMagic}) {
+            next if length $contents == 0; # don't apply magic to degenerates
+            next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
         }
             
 
