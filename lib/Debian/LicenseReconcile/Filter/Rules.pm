@@ -57,7 +57,7 @@ sub _find_rule {
             next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
         }
         if (exists $rule->{Matches}) {
-            next if $contents !~ qr/$rule->{Contains}/xms;
+            next if $contents !~ qr/$rule->{Matches}/xms;
         }
             
 

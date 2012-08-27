@@ -55,10 +55,4 @@ cmp_deeply(\@data, [
         test=>'Rules',
         copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
     },
-    {
-        file=>'base.h',
-        license=>'GPL-1',
-        test=>'Rules',
-        copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
-    },
 ]);
