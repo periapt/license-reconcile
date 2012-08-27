@@ -8,6 +8,7 @@ use Readonly;
 use File::Slurp;
 use File::FnMatch qw(:fnmatch);
 use File::MMagic;
+use Dpkg::Version;
 
 Readonly my $TEST_NAME => 'Rules';
 Readonly my $MMAGIC => File::MMagic->new('/etc/magic');
@@ -40,6 +41,13 @@ sub _find_rule {
         if (exists $rule->{Glob}) {
             next if not fnmatch($rule->{Glob}, $file);
         }
+        if (exists $rule->{MaxVersion}) {
+            my $max_version
+                = Dpkg::Version->new($rule->{MaxVersion});
+            my $this_version
+                = Dpkg::Version->new($self->changelog->data->[0]->Version);
+            next if $this_version > $max_version;
+        }
         my $contents = read_file($self->directory."/$file");
         if (exists $rule->{Contains}) {
             next if -1 == index $contents, $rule->{Contains};
@@ -47,6 +55,9 @@ sub _find_rule {
         if (exists $rule->{MMagic}) {
             next if length $contents == 0; # don't apply magic to degenerates
             next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
+        }
+        if (exists $rule->{Matches}) {
+            next if $contents !~ qr/$rule->{Contains}/xms;
         }
             
 

@@ -1,0 +1,11 @@
+example (3.20.16beta-2) unstable; urgency=low
+
+  * Blah, blah,blah
+
+ -- Christian Schwarz <schwarz@debian.org>  Sun, 11 May 1997 14:19:26 +0200
+
+example (3.20.16beta-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Christian Schwarz <schwarz@debian.org>  Sat, 12 Apr 1997 13:51:28 +0200

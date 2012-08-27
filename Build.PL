@@ -22,6 +22,7 @@ my $builder = Module::Build->new(
         'File::Slurp' => 0,
         'File::MMagic' => 0,
         'File::FnMatch' => 0,
+        'Dpkg::Version' => 0,
     },
     add_to_cleanup      => [ 'Debian-LicenseReconcile-*' ],
     create_makefile_pl => 'traditional',

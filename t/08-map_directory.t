@@ -69,6 +69,7 @@ cmp_deeply($copyright->map_directory('t/data/example'), {
     'base'=>$data,
     'sample.png'=>$data,
     'base.h'=>$data,
+    'debian/changelog'=>$data3,
     'debian/control'=>$data3,
     'debian/copyright'=>$data3,
 }, 'directory mapping');

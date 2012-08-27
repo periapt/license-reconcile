@@ -18,5 +18,6 @@ cmp_deeply(\@files, [
 	'a/g/scriggs.t',
 	'a/g/blah',
 	'debian/control',
+	'debian/changelog',
 	'debian/copyright',
 ]);
