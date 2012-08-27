@@ -35,6 +35,8 @@ sub _find_rule {
     my $file = shift;
     my @rules = @{$self->config->{rules}};
     my $matching_rule = undef;
+    my $contents = undef;
+    my $this_version = undef;
     foreach my $rule (@rules) {
 
         # Run through the test clauses
@@ -42,19 +44,22 @@ sub _find_rule {
             next if not fnmatch($rule->{Glob}, $file);
         }
         if (exists $rule->{MaxVersion}) {
-            my $max_version
-                = Dpkg::Version->new($rule->{MaxVersion});
-            my $this_version
-                = Dpkg::Version->new($self->changelog->data->[0]->Version);
+            if (not $this_version) {
+                $this_version
+                    = Dpkg::Version->new($self->changelog->data->[0]->Version);
+            }
+            my $max_version = Dpkg::Version->new($rule->{MaxVersion});
             next if $this_version > $max_version;
         }
-        my $contents = read_file($self->directory."/$file");
-        if (exists $rule->{Contains}) {
-            next if -1 == index $contents, $rule->{Contains};
+        if (not $contents) {
+            $contents = read_file($self->directory."/$file");
         }
         if (exists $rule->{MMagic}) {
             next if length $contents == 0; # don't apply magic to degenerates
             next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
+        }
+        if (exists $rule->{Contains}) {
+            next if -1 == index $contents, $rule->{Contains};
         }
         if (exists $rule->{Matches}) {
             next if $contents !~ qr/$rule->{Matches}/xms;
