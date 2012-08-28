@@ -1,0 +1,129 @@
+package Debian::LicenseReconcile::LicenseCheck;
+
+use 5.006;
+use strict;
+use warnings;
+use Readonly;
+use System::Command;
+use File::Slurp;
+
+Readonly my %LICENSE_MAPPING => (
+    'GPL' => 'GPL-2',
+    'GPL-2' => 'GPL-2',
+    'GPL (v2)' => 'GPL-2',
+    'GPL (v2 or later)' => 'GPL-2+',
+    'LGPL (v2)' => 'LGPL',
+    'zlib/libpng' => 'zlib/libpng',
+);
+
+Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf', '--copyright');
+
+Readonly my $PARSE_RE => qr{
+    ^                           # beginning of line
+    ([^\n:]+)                   # file name
+    :\s+                        # separator
+    ([^\n]+)                    # license
+    \s*                         # just in case
+    $                           # end of line
+    \s*                         # just in case
+    ([^\n]+)                    # copyright notice
+    \s*                         # just in case
+    $                           # end of line
+    \s*                         # just in case
+}xms;
+
+sub new {
+    my $class = shift;
+    my $self = {mapping=>{}};
+    $self->{directory} = shift;
+    %{$self->{mapping}} = (%LICENSE_MAPPING, @_);
+    bless $self, $class;
+    return $self;
+}
+
+sub get_info {
+    my $self = shift;
+    my $subject = shift;
+    my @commands = @SCRIPT;
+    if (-d $subject) {
+        push @commands, '--recursive';
+    }
+    push @commands, $subject;
+    my ( $pid, $in, $out, $err ) = System::Command->spawn(@commands);
+    close $in;
+    my $output = read_file $out;
+    my @results;
+    while ($output =~ /$PARSE_RE/g) {
+        my $file = substr($1, 1+length $self->directory);
+        my $license = $self->_cleanup_license($2);
+        next if not $license;
+        my $copyright = $3;
+        push @results, {
+            file => $file,
+            license => $license,
+            copyright => $copyright,
+        };
+    }
+    return @results;
+}
+
+sub _cleanup_license {
+    my $self = shift;
+    my $license = shift;
+    $license =~ s{\*No\s+copyright\*}{}xms;
+    $license =~ s{GENERATED\s+FILE}{}xms;
+    $license =~ s{^\s+}{}xms;
+    $license =~ s{\s+$}{}xms;
+    $license =~ s{\s+\(with\s+incorrect\s+FSF\s+address\)}{}xms;
+    return $self->{mapping}->{$license} if exists $self->{mapping}->{$license};
+    return if $license eq 'UNKNOWN';
+    return $license;
+}
+
+=head1 NAME
+
+Debian::LicenseReconcile::Filter::Std - applies licensecheck to get data
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
+
+
+=head1 SYNOPSIS
+
+    use Debian::LicenseReconcile::Filter::Std;
+
+    my $filter = Debian::LicenseReconcile::Filter::Std->new(directory=>'.');
+    my @info = $filter->get_info(@files);
+
+=head1 SUBROUTINES/METHODS
+
+=head2 get_info
+
+Returns a list of hash references describing copyright and license information
+that should be checked against the copyright target. The results returned
+from this filter are those that are obtained from
+C<licensecheck --no-conf --recursive --copyright DIR>.
+
+=head1 AUTHOR
+
+Nicholas Bamber, C<< <nicholas at periapt.co.uk> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Nicholas Bamber.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+1; # End of Debian::LicenseReconcile::FormatSpec
