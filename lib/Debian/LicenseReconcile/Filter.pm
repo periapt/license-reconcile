@@ -12,10 +12,61 @@ use Class::XSAccessor
         config => 'config',
     },
 ;
+use Readonly;
+use File::Slurp;
+use File::FnMatch qw(:fnmatch);
+use File::MMagic;
+use Dpkg::Version;
+
+Readonly my $MMAGIC => File::MMagic->new('/etc/magic');
+
 
 sub get_info {
     my $self = shift;
     die "not implemented in base class";
+}
+
+sub find_rule {
+    my $self = shift;
+    my $file = shift;
+    my $rules = shift;
+    my $matching_rule = undef;
+    my $contents = undef;
+    my $this_version = undef;
+    foreach my $rule (@$rules) {
+
+        # Run through the test clauses
+        if (exists $rule->{Glob}) {
+            next if not fnmatch($rule->{Glob}, $file);
+        }
+        if (exists $rule->{MaxVersion}) {
+            if (not $this_version) {
+                $this_version
+                    = Dpkg::Version->new($self->changelog->data->[0]->Version);
+            }
+            my $max_version = Dpkg::Version->new($rule->{MaxVersion});
+            next if $this_version > $max_version;
+        }
+        if (not $contents) {
+            $contents = read_file($self->directory."/$file");
+        }
+        if (exists $rule->{MMagic}) {
+            next if length $contents == 0; # don't apply magic to degenerates
+            next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
+        }
+        if (exists $rule->{Contains}) {
+            next if -1 == index $contents, $rule->{Contains};
+        }
+        if (exists $rule->{Matches}) {
+            next if $contents !~ qr/$rule->{Matches}/xms;
+        }
+            
+
+        # Now we've found a matching rule
+        $matching_rule = $rule;
+        return $rule;
+    }
+    return;
 }
 
 =head1 NAME
@@ -65,6 +116,34 @@ Returns the L<Parse::DebianChangelog> as set in the constructor.
 =head2 config
 
 Returns the config data as set in the constructor.
+
+=head2 find_rule
+
+This is a helper method designed to allow derived classes implement
+rules based semantics. It takes a file name and an array ref to a sequence
+of rules. Each rule is a hash ref, which may contain the following fields:
+
+=over 
+
+=item - Glob (optional) - a file glob to limit which files the rule applies to.
+
+=item - Contains (optional) - a piece of text which the file must contain for the
+rule to apply.
+
+=item - Matches (optional) - an extended regular expression which the file contents
+must match for the rule to apply.
+
+=item - MMagic (optional) - a string which must equal the magic value obtained from
+L<File::MMagic> for the rule to apply.
+
+=item - MaxVersion (optional) - an upstream version string after which the rule will
+not be applied. This is recommended unless you are certain that the rule is robust
+so that the rule will be regularly reviewed.
+
+=back
+
+The first rule which matches the file is returned. If no rule matches then 
+undef is returned.
 
 =head1 AUTHOR
 

@@ -5,20 +5,15 @@ use strict;
 use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
 use Readonly;
-use File::Slurp;
-use File::FnMatch qw(:fnmatch);
-use File::MMagic;
-use Dpkg::Version;
 
 Readonly my $TEST_NAME => 'Rules';
-Readonly my $MMAGIC => File::MMagic->new('/etc/magic');
 
 sub get_info {
     my $self = shift;
     my @results;
 
     foreach my $file (@{$self->files_remaining}) {
-        my $rule = $self->_find_rule($file);
+        my $rule = $self->find_rule($file, $self->config->{rules});
         next if not $rule;
         push @results, {
             file=>$file,
@@ -28,49 +23,6 @@ sub get_info {
         };
     }
     return @results;
-}
-
-sub _find_rule {
-    my $self = shift;
-    my $file = shift;
-    my @rules = @{$self->config->{rules}};
-    my $matching_rule = undef;
-    my $contents = undef;
-    my $this_version = undef;
-    foreach my $rule (@rules) {
-
-        # Run through the test clauses
-        if (exists $rule->{Glob}) {
-            next if not fnmatch($rule->{Glob}, $file);
-        }
-        if (exists $rule->{MaxVersion}) {
-            if (not $this_version) {
-                $this_version
-                    = Dpkg::Version->new($self->changelog->data->[0]->Version);
-            }
-            my $max_version = Dpkg::Version->new($rule->{MaxVersion});
-            next if $this_version > $max_version;
-        }
-        if (not $contents) {
-            $contents = read_file($self->directory."/$file");
-        }
-        if (exists $rule->{MMagic}) {
-            next if length $contents == 0; # don't apply magic to degenerates
-            next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
-        }
-        if (exists $rule->{Contains}) {
-            next if -1 == index $contents, $rule->{Contains};
-        }
-        if (exists $rule->{Matches}) {
-            next if $contents !~ qr/$rule->{Matches}/xms;
-        }
-            
-
-        # Now we've found a matching rule
-        $matching_rule = $rule;
-        return $rule;
-    }
-    return;
 }
 
 =head1 NAME
