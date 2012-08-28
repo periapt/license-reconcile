@@ -10,6 +10,7 @@ use System::Command;
 use File::Slurp;
 
 Readonly my %LICENSE_MAPPING => (
+    'GPL' => 'GPL-2',
     'GPL-2' => 'GPL-2',
     'GPL (v2)' => 'GPL-2',
     'GPL (v2 or later)' => 'GPL-2+',
