@@ -8,6 +8,7 @@ use Readonly;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::FormatSpec;
 use Debian::LicenseReconcile::CopyrightTarget;
+use Debian::LicenseReconcile::LicenseCheck;
 use Debian::LicenseReconcile;
 use Parse::DebianChangelog;
 use UNIVERSAL::require;
@@ -37,7 +38,6 @@ GetOptions(
     'directory=s' => \$directory,
     'config-file=s' => \$config_file,
     'changelog-file=s' => \$changelog_file,
-#    'filters=s' => \@filters,
     'filters=s@' => sub {
         shift; # name of option
         my $value = shift;
@@ -67,6 +67,11 @@ Readonly my $CONFIG => Config::Any->load_files({
     flatten_to_hash=>1,
 })->{$config_file};
 
+Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new(
+    $directory,
+    $CONFIG->{LicenseCheck}
+);
+
 my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
 if ($copyright_target->parse($COPYRIGHT_TEXT)) {
 
@@ -89,6 +94,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
             files_remaining=>\@files_remaining,
             config=>$CONFIG->{$filter_name},
             changelog=>$CHANGELOG,
+            licensecheck=>$LICENSECHECK,
         );
         foreach my $titbit ($test->get_info) {
             next if $file_checked{$titbit->{file}};
@@ -224,6 +230,8 @@ relevant to this filter.
 
 =item - changelog - a L<Parse::DebianChangelog> object.
 
+=item - licensecheck - a L<Debian::LicenseReconcile::LicenseCheck> object.
+
 =back
 
 =head1 LIMITATIONS
@@ -232,8 +240,9 @@ Currently I am ignoring the copyright data and concentrating on the license data
 
 Also the DEP-5 specification is subtly different from the file glob specification.
 Since the L<File::FnMatch> module is the only practical implementation there
-is little that can be done. The consequence is that file names including
-square brackets are unlikely to be handled correctly.
+is little that can be done. The consequence is that attempting to specify that a
+file name should contain '[' or ']' in C<debian/copyright> is unlikely to work
+correctly.
 
 =head1 AUTHOR
 

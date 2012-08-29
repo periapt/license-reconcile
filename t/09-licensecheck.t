@@ -3,9 +3,13 @@
 use Test::More tests => 3;
 use Test::Deep;
 use Debian::LicenseReconcile::Filter::Std;
+use Debian::LicenseReconcile::LicenseCheck;
+use Readonly;
+
+Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new('t/data/example');
 
 my $filter = Debian::LicenseReconcile::Filter::Std->new(
-    directory=>'t/data/example',
+    licensecheck=>$LICENSECHECK,
 );
 isa_ok($filter, 'Debian::LicenseReconcile::Filter');
 isa_ok($filter, 'Debian::LicenseReconcile::Filter::Std');

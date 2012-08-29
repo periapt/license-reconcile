@@ -6,68 +6,12 @@ use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
 use Debian::LicenseReconcile::Errors;
 use Readonly;
-use System::Command;
-use File::Slurp;
-
-Readonly my %LICENSE_MAPPING => (
-    'GPL' => 'GPL-2',
-    'GPL-2' => 'GPL-2',
-    'GPL (v2)' => 'GPL-2',
-    'GPL (v2 or later)' => 'GPL-2+',
-    'LGPL (v2)' => 'LGPL',
-    'zlib/libpng' => 'zlib/libpng',
-);
-
-Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf', '--copyright', '--recursive');
-
-Readonly my $PARSE_RE => qr{
-    ^                           # beginning of line
-    ([^\n:]+)                   # file name
-    :\s+                        # separator
-    ([^\n]+)                    # license
-    \s*                         # just in case
-    $                           # end of line
-    \s*                         # just in case
-    ([^\n]+)                    # copyright notice
-    \s*                         # just in case
-    $                           # end of line
-    \s*                         # just in case
-}xms;
 
 Readonly my $TEST_NAME => 'Std';
 
 sub get_info {
     my $self = shift;
-    my ( $pid, $in, $out, $err ) = System::Command->spawn(@SCRIPT, $self->{directory});
-    close $in;
-    my $output = read_file $out;
-    my @results;
-    while ($output =~ /$PARSE_RE/g) {
-        my $file = substr($1, 1+length $self->directory);
-        my $license = $self->_cleanup_license($2);
-        next if not $license;
-        my $copyright = $3;
-        push @results, {
-            file => $file,
-            license => $license,
-            copyright => $copyright,
-            test => $TEST_NAME,
-        };
-    }
-    return @results;
-}
-
-sub _cleanup_license {
-    my $self = shift;
-    my $license = shift;
-    $license =~ s{\*No\s+copyright\*}{}xms;
-    $license =~ s{GENERATED\s+FILE}{}xms;
-    $license =~ s{^\s+}{}xms;
-    $license =~ s{\s+$}{}xms;
-    $license =~ s{\s+\(with\s+incorrect\s+FSF\s+address\)}{}xms;
-    return $LICENSE_MAPPING{$license} if exists $LICENSE_MAPPING{$license};
-    return if $license eq 'UNKNOWN';
-    return $license;
+    return map { $_->{test} = $TEST_NAME; $_ } $self->licensecheck->get_info;
 }
 
 =head1 NAME

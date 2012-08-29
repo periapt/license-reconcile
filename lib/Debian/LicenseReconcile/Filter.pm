@@ -10,6 +10,7 @@ use Class::XSAccessor
         files_remaining => 'files_remaining',
         changelog => 'changelog',
         config => 'config',
+        licensecheck => 'licensecheck',
     },
 ;
 use Readonly;
@@ -116,6 +117,11 @@ Returns the L<Parse::DebianChangelog> as set in the constructor.
 =head2 config
 
 Returns the config data as set in the constructor.
+
+=head2 licensecheck
+
+Returns the L<Debian::LicenseReconcile::LicenseCheck> object
+as set in the constructor.
 
 =head2 find_rule
 
