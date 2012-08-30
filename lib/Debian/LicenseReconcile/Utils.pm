@@ -12,6 +12,8 @@ sub get_files {
     my $directory = shift;
     my @files = ();
     find(sub {
+        return if $File::Find::name =~ m{\A\.git};
+        return if $File::Find::name =~ m{\A\.pc};
         push @files, substr($File::Find::name,length($directory)+1) if ! -d $_;
     }, $directory);
     return @files;

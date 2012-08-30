@@ -1,4 +1,3 @@
-1.) CT should report any files that do not get mapped
 2.) file permissions rule clause
 3.) allow rules to read only the first N bytes - but benchmark
 4.) copyright checking
@@ -8,3 +7,4 @@
 8.) test coverage
 9.) debian packaging
 10.) Docs: how to use, config
+11.) exclude files from mapping configurably

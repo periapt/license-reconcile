@@ -58,6 +58,13 @@ sub map_directory {
         }
     }
 
+    my @missing = grep {not exists $file_mapping->{$_}} @files;
+    foreach my $file (@missing) {
+        Debian::LicenseReconcile::Errors->push(
+            test => 'FileMapping',
+            msg => "Could not find matching copyright clause for $file",
+        );
+    }
     return $file_mapping;
 }
 

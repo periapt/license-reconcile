@@ -149,6 +149,9 @@ first line?
 
 =item - Can the copyright file be parsed?
 
+=item - Does every file in the source match at least one clause in the copyright
+file?
+
 =item - Can every file, license and copyright datum extracted from the source be
 contained in the corresponding matching paragraph from the copyright file?
 The data for this comparison comes from a number filter objects. See L</Filters>
