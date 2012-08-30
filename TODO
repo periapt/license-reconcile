@@ -1,0 +1,9 @@
+1.) CT should report any files that do not get mapped
+2.) file permissions rule clause
+3.) allow rules to read only the first N bytes - but benchmark
+4.) copyright checking
+5.) filter aliasing
+6.) app module
+7.) changelog processing
+8.) test coverage
+9.) debian packaging

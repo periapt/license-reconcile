@@ -110,5 +110,11 @@ Rules:
    License: BSD (3 clause) or GPL-2
    Comment: Check the actual file but this looks like a dual-license to me
 Std:
+#Shebang:
+# rules:
+#  -
+#   Glob: BUILD/*
+#  -
+#   Matches: \A\#\!
 Default:
 
