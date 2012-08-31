@@ -4,7 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
-use Debian::LicenseReconcile::Errors;
 use Readonly;
 
 Readonly my $TEST_NAME => 'Std';
@@ -31,8 +30,11 @@ our $VERSION = '0.01';
 
     use Debian::LicenseReconcile::Filter::Std;
 
-    my $filter = Debian::LicenseReconcile::Filter::Std->new(directory=>'.');
-    my @info = $filter->get_info(@files);
+    my $filter = Debian::LicenseReconcile::Filter::Std->new(
+        directory=>'.',
+        licensecheck=>$LICENSECHECK,
+    );
+    my @info = $filter->get_info();
 
 =head1 SUBROUTINES/METHODS
 

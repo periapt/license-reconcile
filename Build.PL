@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
         'Class::XSAccessor' => 0,
         'Config::Any' => 0,
         'Debian::Copyright' => '0.2',
+        'Email::Address' => 0,
         'Parse::DebianChangelog' => 0,
         'File::Slurp' => 0,
         'File::MMagic' => 0,

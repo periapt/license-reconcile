@@ -47,7 +47,7 @@ our $VERSION = '0.01';
         files_remaining=>[....],
         config=>[....],
     );
-    my @info = $filter->get_info(@files);
+    my @info = $filter->get_info();
 
 =head1 SUBROUTINES/METHODS
 

@@ -61,7 +61,7 @@ if ($format_spec) {
         Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
 }
 
-Readonly my $CONFIG => Config::Any->load_files({
+my $CONFIG = Config::Any->load_files({
     files=>[$config_file],
     use_ext=>1,
     flatten_to_hash=>1,
@@ -69,7 +69,7 @@ Readonly my $CONFIG => Config::Any->load_files({
 
 Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new(
     $directory,
-    $CONFIG->{LicenseCheck}
+    get_config('LicenseCheck'),
 );
 
 my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
@@ -92,7 +92,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
         my $test = $class->new(
             directory=>$directory,
             files_remaining=>\@files_remaining,
-            config=>$CONFIG->{$filter_name},
+            config=>get_config($filter_name),
             changelog=>$CHANGELOG,
             licensecheck=>$LICENSECHECK,
         );
@@ -120,6 +120,12 @@ if (not $quiet) {
 }
 
 exit(Debian::LicenseReconcile::Errors->how_many);
+
+sub get_config {
+    my $tag = shift;
+    return $CONFIG->{$tag} if exists $CONFIG->{$tag};
+    return {};
+}
 
 =head1 NAME
 
