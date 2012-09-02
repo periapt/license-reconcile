@@ -36,7 +36,7 @@ Readonly my $PERSON_PARSE_RE => qr{
 
 sub get_info {
     my $self = shift;
-    my $license = $self->config->{license} | 'GPL-2+';
+    my $license = $self->config->{license} || 'GPL-2+';
     my %maintainers = ();
     my %email_changes = ();
     foreach ( $self->changelog->data() ) {
@@ -80,7 +80,7 @@ sub get_info {
     }
     @strings = sort @strings;
     my @results;
-    foreach my $file ($self->files_remaining) {
+    foreach my $file (@{$self->files_remaining}) {
         next if not $file =~ m{\Adebian/}xms;
         push @results, {
             test=>$TEST_NAME,

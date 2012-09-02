@@ -69,7 +69,8 @@ my $CONFIG = Config::Any->load_files({
 
 Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new(
     $directory,
-    get_config('LicenseCheck'),
+    $CONFIG->{LicenseCheck},
+    #get_config('LicenseCheck'),
 );
 
 my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
@@ -92,7 +93,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
         my $test = $class->new(
             directory=>$directory,
             files_remaining=>\@files_remaining,
-            config=>get_config($filter_name),
+            config=>$CONFIG->{$filter_name},
             changelog=>$CHANGELOG,
             licensecheck=>$LICENSECHECK,
         );

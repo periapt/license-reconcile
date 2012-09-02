@@ -116,5 +116,7 @@ Std:
 #   Glob: BUILD/*
 #  -
 #   Matches: \A\#\!
+ChangeLog:
+ license: GPL-2+
 Default:
 
