@@ -4,9 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
-use Readonly;
-
-Readonly my $TEST_NAME => 'Rules';
 
 sub get_info {
     my $self = shift;
@@ -19,7 +16,7 @@ sub get_info {
             file=>$file,
             copyright=>$rule->{Copyright},
             license=>$rule->{License},
-            test=>$TEST_NAME,
+            test=>$self->name,
         };
     }
     return @results;

@@ -2,11 +2,9 @@
 2.) file permissions rule clause
 3.) allow rules to read only the first N bytes - but benchmark
 4.) copyright checking
-5.) filter aliasing
 6.) app module
 7.) exit status would be safer just 0 or 1
 8.) test coverage
 9.) debian packaging
 10.) Docs: how to use, config
 11.) exclude files from mapping configurably
-12.) Email change does not seem to be working

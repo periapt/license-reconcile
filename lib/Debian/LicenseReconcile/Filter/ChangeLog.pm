@@ -6,8 +6,6 @@ use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
 use Readonly;
 
-Readonly my $TEST_NAME => 'ChangeLog';
-
 Readonly my $ACTUAL_NAME_RE => '\pL[\s\pL\-\'\.]*\pL';
 
 # See http://www.faqs.org/rfcs/rfc2822.html
@@ -83,7 +81,7 @@ sub get_info {
     foreach my $file (@{$self->files_remaining}) {
         next if not $file =~ m{\Adebian/}xms;
         push @results, {
-            test=>$TEST_NAME,
+            test=>$self->name,
             file=>$file,
             license=>$license,
             copyright=>\@strings,

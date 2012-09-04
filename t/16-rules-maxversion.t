@@ -14,6 +14,7 @@ my @files = get_files($DIR);
 
 my $filter = Debian::LicenseReconcile::Filter::Rules->new(
     directory=>$DIR,
+    name=>'Rules7',
     changelog=>$CHANGELOG,
     config=>{
         rules=>[
@@ -42,13 +43,13 @@ cmp_deeply(\@data, [
     {
         file=>'base',
         license=>'GPL-1',
-        test=>'Rules',
+        test=>'Rules7',
         copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
     },
     {
         file=>'base.h',
         license=>'GPL-1',
-        test=>'Rules',
+        test=>'Rules7',
         copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
     },
 ]);

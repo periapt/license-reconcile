@@ -4,9 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
-use Readonly;
-
-Readonly my $TEST_NAME => 'Shebang';
 
 sub get_info {
     my $self = shift;
@@ -22,7 +19,7 @@ sub get_info {
         next if not $rule;
         my @tmp = $self->licensecheck->get_info($file);
         if (@tmp) {
-            $tmp[0]->{test} = $TEST_NAME;
+            $tmp[0]->{test} = $self->name;
             push @results, $tmp[0];
         }
     }

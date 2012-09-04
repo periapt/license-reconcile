@@ -6,11 +6,9 @@ use warnings;
 use base qw(Debian::LicenseReconcile::Filter);
 use Readonly;
 
-Readonly my $TEST_NAME => 'Std';
-
 sub get_info {
     my $self = shift;
-    return map { $_->{test} = $TEST_NAME; $_ } $self->licensecheck->get_info;
+    return map { $_->{test} = $self->name; $_ } $self->licensecheck->get_info;
 }
 
 =head1 NAME

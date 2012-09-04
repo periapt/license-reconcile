@@ -22,6 +22,7 @@ my $filter = Debian::LicenseReconcile::Filter::Rules->new(
         ],
     },
     files_remaining=>\@files,
+    name=>'Rules3',
 );
 isa_ok($filter, 'Debian::LicenseReconcile::Filter');
 isa_ok($filter, 'Debian::LicenseReconcile::Filter::Rules');
@@ -30,6 +31,6 @@ my @data = $filter->get_info;
 cmp_deeply(\@data, [{
     file=>'base',
     license=>'GPL-1',
-    test=>'Rules',
+    test=>'Rules3',
     copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
 }]);

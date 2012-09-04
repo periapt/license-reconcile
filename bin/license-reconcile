@@ -87,7 +87,8 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
     my $reconcile = Debian::LicenseReconcile->new;
     my %file_checked = ();
     foreach my $filter_name (@filters) {
-        my $class = "Debian::LicenseReconcile::Filter::$filter_name";
+        my $class;
+        ($class, $filter_name) = parse_filter_name($filter_name);
         $class->require;
         my @files_remaining = grep {not exists $file_checked{$_}} keys %$file_mapping;
         my $test = $class->new(
@@ -96,6 +97,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
             config=>$CONFIG->{$filter_name},
             changelog=>$CHANGELOG,
             licensecheck=>$LICENSECHECK,
+            name=>$filter_name,
         );
         foreach my $titbit ($test->get_info) {
             next if $file_checked{$titbit->{file}};
@@ -126,6 +128,19 @@ sub get_config {
     my $tag = shift;
     return $CONFIG->{$tag} if exists $CONFIG->{$tag};
     return {};
+}
+
+sub parse_filter_name {
+    my $filter_name = shift;
+    my $class = "Debian::LicenseReconcile::Filter::";
+    if ($filter_name =~ m{\A(\w+)~(\w+)\z}xms) {
+        $class .= $2;
+        $filter_name = $1;
+    }
+    else {
+        $class .= $filter_name;
+    }
+    return $class, $filter_name;
 }
 
 =head1 NAME

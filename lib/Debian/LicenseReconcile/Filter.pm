@@ -11,6 +11,7 @@ use Class::XSAccessor
         changelog => 'changelog',
         config => 'config',
         licensecheck => 'licensecheck',
+        name=>'name',
     },
 ;
 use Readonly;
@@ -122,6 +123,10 @@ Returns the config data as set in the constructor.
 
 Returns the L<Debian::LicenseReconcile::LicenseCheck> object
 as set in the constructor.
+
+=head2 name 
+
+Returns the name set in the constructor.
 
 =head2 find_rule
 
