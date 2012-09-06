@@ -111,18 +111,7 @@ Rules:
    Comment: Check the actual file but this looks like a dual-license to me
   -
    Glob: dbug/*
-   Contains: |
-    /******************************************************************************
-     *                                                                            *
-     *                                 N O T I C E                                *
-     *                                                                            *
-     *                    Copyright Abandoned, 1987, Fred Fish                    *
-     *                                                                            *
-     *                                                                            *
-     *      This previously copyrighted work has been placed into the  public     *
-     *      domain  by  the  author  and  may be freely used for any purpose,     *
-     *      private or commercial.                                                *
-     *                                                                            *
+   Matches: Copyright\s+Abandoned,\s+1987,\s+Fred\s+Fish\s+\*\s+\*\s+\*\s+\*\s+\*\s+\*\s+This\s+previously\s+copyrighted\s+work\s+has\s+been\s+placed\s+into\s+the\s+public\s+\*\s+\*\s+domain\s+by\s+the\s+author\s+and\s+may\s+be\s+freely\s+used\s+for\s+any\s+purpose,\s+\*\s+\*\s+private\s+or\s+commercial\.
    Copyright: 1987 Abandoned Fred Fish
    License: public-domain
 Std:
@@ -136,6 +125,11 @@ ChangeLog:
  license: GPL-2+
 Default:
  rules:
+  -
+   Glob: cmd-line-utils/readline/*
+   Copyright: 1987-2006 Free Software Foundation Inc
+   License: GPL-2+
+   Justification: More based on the actual files than cmd-line-utils/readline/README
   -
    Glob: zlib/*
    Copyright: 1995-2005 Jean-loup Gailly and Mark Adler

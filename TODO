@@ -2,9 +2,17 @@
 2.) file permissions rule clause
 3.) allow rules to read only the first N bytes - but benchmark
 4.) copyright checking
+5.) Need to treat UNKOWN license differently. We have no license to check
+and must not generate an error for a license mismatch. But the copyright is
+still checkable.
 6.) app module
 7.) exit status would be safer just 0 or 1
 8.) test coverage
 9.) debian packaging
 10.) Docs: how to use, config
 11.) exclude files from mapping configurably
+12.) Documentation should talk about Justififcation field rather than Comment
+13.) Document filter aliases
+14.) There is a bug in the licensecheck handling
+licensecheck gets the results for cmd-line-utils/libedit/tty.c
+but the wrapper does not return it
