@@ -8,6 +8,7 @@ use System::Command;
 use File::Slurp;
 
 Readonly my %LICENSE_MAPPING => (
+    'Apache (v2.0)' => 'Apache-2.0',
     'GPL' => 'GPL-2',
     'GPL-2' => 'GPL-2',
     'GPL (v2)' => 'GPL-2',
