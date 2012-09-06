@@ -28,7 +28,7 @@ Rules:
     */
    License: GPL-2
    Copyright: Copyright (c) 2004, 2006, 2007 MySQL AB, 2009 Sun Microsystems, Inc.
-   Comment: Seems to have been taken out of public domain by Oracle.
+   Justification: Seems to have been taken out of public domain by Oracle.
   -
    Glob: storage/ndb/src/common/util/md5_hash.cpp
    MaxVersion: 5.6
@@ -53,7 +53,7 @@ Rules:
    Matches: the\s+Free\s+Software\s+Foundation;\s+version\s+2\s+of\s+the\s+License.
    License: GPL-2
    Copyright: Copyright (C) 2003 MySQL AB
-   Comment: Seems to have been taken out of public domain by Oracle.
+   Justification: Seems to have been taken out of public domain by Oracle.
   -
    Glob: mysys/md5.c
    MaxVersion: 5.6
@@ -100,7 +100,7 @@ Rules:
        public domain.  */
    License: GPL-2
    Copyright: Copyright (C) 2000 MySQL AB
-   Comment: Seems to have been taken out of public domain by Oracle.
+   Justification: Seems to have been taken out of public domain by Oracle.
   -
    Glob: storage/ndb/test/include/getarg.h
    MaxVersion: 5.5.30
@@ -108,7 +108,7 @@ Rules:
     2003 MySQL AB
     1997-1999 Kungliga Tekniska Högskolan
    License: BSD (3 clause) or GPL-2
-   Comment: Check the actual file but this looks like a dual-license to me
+   Justification: Check the actual file but this looks like a dual-license to me
   -
    Glob: dbug/*
    Matches: Copyright\s+Abandoned,\s+1987,\s+Fred\s+Fish\s+\*\s+\*\s+\*\s+\*\s+\*\s+\*\s+This\s+previously\s+copyrighted\s+work\s+has\s+been\s+placed\s+into\s+the\s+public\s+\*\s+\*\s+domain\s+by\s+the\s+author\s+and\s+may\s+be\s+freely\s+used\s+for\s+any\s+purpose,\s+\*\s+\*\s+private\s+or\s+commercial\.

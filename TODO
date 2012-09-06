@@ -5,7 +5,6 @@ still checkable.
 3.) There is a bug in the licensecheck handling
 licensecheck gets the results for cmd-line-utils/libedit/tty.c
 but the wrapper does not return it
-4.) Documentation should talk about Justififcation field rather than Comment
 5.) Document filter aliases
 6.) Docs: how to use, config
 7.) app module

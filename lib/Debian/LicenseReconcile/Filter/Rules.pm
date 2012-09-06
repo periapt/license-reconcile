@@ -72,9 +72,9 @@ L<File::MMagic> for the rule to apply.
 not be applied. This is recommended unless you are certain that the rule is robust
 so that the rule will be regularly reviewed.
 
-=item - Comment (optional) - free text documentation concerning the rule. This might
-include the reasons for the rule as well as any Debian or upstream bug reports
-relating to the rule.
+=item - Justification (optional) - free text documentation concerning the rule.
+This might include the reasons for the rule as well as any Debian or upstream bug
+reports relating to the rule.
 
 =item - License (mandatory) - the short form of the license.
 
