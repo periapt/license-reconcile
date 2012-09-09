@@ -8,10 +8,10 @@ but the wrapper does not return it
 5.) Document filter aliases
 6.) Docs: how to use, config
 7.) app module
-8.) exit status would be safer just 0 or 1
 9.) test coverage
 10.) debian packaging
 11.) exclude files from mapping configurably
 12.) expose --check and --exclude licensecheck options
 13.) file permissions rule clause
 14.) allow rules to read only the first N bytes - but benchmark
+15.) floundered on bwctl format spec - why

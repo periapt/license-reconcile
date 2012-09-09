@@ -122,7 +122,7 @@ if (not $quiet) {
     }
 }
 
-exit(Debian::LicenseReconcile::Errors->how_many);
+exit(Debian::LicenseReconcile::Errors->how_many > 0 ? 1 : 0);
 
 sub get_config {
     my $tag = shift;
