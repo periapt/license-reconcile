@@ -1,14 +1,14 @@
 1.) copyright checking
-2.) Need to treat UNKOWN license differently. We have no license to check
+2.) Need to treat UNKNOWN license differently. We have no license to check
 and must not generate an error for a license mismatch. But the copyright is
 still checkable.
 3.) There is a bug in the licensecheck handling
 licensecheck gets the results for cmd-line-utils/libedit/tty.c
 but the wrapper does not return it
-5.) Document filter aliases
-6.) Docs: how to use, config
+4.) Need a Dh_Sequence as well.
 7.) app module
-9.) test coverage
+8.) test coverage
+9.) allow the filter sequence to be explicitly set in the config file.
 10.) debian packaging
 11.) exclude files from mapping configurably
 12.) expose --check and --exclude licensecheck options

@@ -179,7 +179,78 @@ contained in the corresponding matching paragraph from the copyright file?
 The data for this comparison comes from a number filter objects. See L</Filters>
 for more information.
 
+=item - Is every file in the source assigned copyright and a license by some
+part of the C<debian/copyright> file.
+
 =back
+
+=head1 GETTING STARTED
+
+=head2 out of the box
+
+From the top level of the source directory of Debian packaged software,
+just run C<license-reconcile>.
+
+=head2 setting a config file
+
+Normally to make any progress it will be necessary to have a config file.
+The default file is C<debian/license-reconcile.yml>. A different config
+file can be set with the B<--config-file=>I<file>. The config file is
+interpreted using L<Config::Any> but for the purposes of this documentation#
+we assume the format is L<YAML>.
+
+=head2 overriding incorrect results
+
+Suppose you are really lucky. For just one file, C<a/b>, the default filters
+which are wrappers around C<licensecheck>, have got it wrong. They have for
+some reason decided that the file has a GPL-3 license, when inspection shows it is
+in the public domain. This is causing a false positive break against your carefully
+crafted C<debian/copyright> file. You can fix this with the following
+config fragment:
+
+ Rules:
+  rules:
+   -
+    Glob: a/b
+    License: public-domain
+    Copyright: 1556, Nostrodamus
+
+See L<Debian::LicenseReconcile::Filter::Rules> for more information on how
+to configure this filter.
+
+=head2 providing a catch all license and copyright
+
+You can make the filters provide a default license, but providing a suitable
+rule in the Default section of the config file:
+
+ Default:
+  rules:
+   -
+    License: All software is property of the proletariat license
+    Copyright: 1984, Ministry of Algorithms
+
+The Default filter uses exactly the same code as the Rules filter, but by default
+runs last. So it has all the same functionality but the lowest precedence.
+
+=head2 controlling the sequence of filters.
+
+By default the filters run are: Rules, Std, Shebang, ChangeLog and Default.
+You can vary the filters using the B<--filters=>I<module> option. Setting
+C<--filters Rules> would mean that only the
+L<Debian::LicenseReconcile::Filter::Rules> filter would be used. Once you
+specify one filter you must specify them all.
+
+=head2 filter aliasing
+
+The Default filter is an alias for Rules. This means it runs the same code
+but has a separate config. Default is defined as "Default~Rules". In general
+"X~Y" means use the code from Y but get the config from X.
+
+=head2 writing your own filter.
+
+You can write your own filters by inheriting from
+L<Debian::LicenseReconcile::Filter>. You need to define the C<get_info>
+method.
 
 =head1 OPTIONS
 
@@ -204,7 +275,7 @@ Display mapping from the directory onto the copyright clauses.
 
 The directory whose copyright and licenses will be verified. This defaults to ".".
 
-=head2 B<--filters=>I<module1 module2 ....>
+=head2 B<--filters=>I<module1>  B<--filters=>I<module2> ....
 
 A sequence of filters which will inspect the source package and return
 license and copyright information. Each module name must sit below the
