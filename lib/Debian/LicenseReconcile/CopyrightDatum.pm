@@ -8,11 +8,32 @@ sub new {
     my $class = shift;
     my $self = {};
     bless $self, $class;
+    my $text = shift;
+    if ($text) {
+        $self->_parse($text);
+    }
     return $self;
 }
 
+sub _parse {
+    my $self = shift;
+    my $text = shift;
+    return;
+}
+    
 sub contains {return 1}
-sub copyright_holders {}
+
+sub copyright_holders {
+    my $self = shift;
+    return keys %$self;
+}
+
+sub years {
+    my $self = shift;
+    my $holder = shift;
+    return if not exists $self->{$holder};
+    return $self->{$holder};
+}
 
 =head1 NAME
 
@@ -61,6 +82,11 @@ L<Debian::LicenseReconcile::CopyrightDatum> and otherwise stringify and parse it
 =head2 copyright_holders 
 
 This method returns the list of copyright holders parsed from the original string.
+
+=head2 years
+
+Given an exactly matching copyright holder this returns the set of years
+as an L<Set::IntSpan> object.
 
 =head1 AUTHOR
 
