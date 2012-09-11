@@ -9,6 +9,7 @@ licensecheck gets the results for cmd-line-utils/libedit/tty.c
 but the wrapper does not return it
 4.) Need a Dh_Sequence as well.
 5.) Should be able to turn off copyright checking as it will be very slow.
+6.) Could do with a man page for the config file format.
 7.) app module
 8.) test coverage
 9.) allow the filter sequence to be explicitly set in the config file.

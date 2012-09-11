@@ -3,6 +3,7 @@ package Debian::LicenseReconcile::CopyrightDatum;
 use 5.006;
 use strict;
 use warnings;
+use Scalar::Util qw(blessed);
 
 sub new {
     my $class = shift;
@@ -21,7 +22,16 @@ sub _parse {
     return;
 }
     
-sub contains {return 1}
+sub contains {
+    my $self = shift;
+    my $other = shift;
+    if (blessed $other ne 'Debian::LicenseReconcile::CopyrightDatum') {
+        $other = Debian::LicenseReconcile::CopyrightDatum->new("$other");
+    }
+    my $msg_ref = shift;
+    undef $msg_ref if not ref $msg_ref;
+    return 1;
+}
 
 sub copyright_holders {
     my $self = shift;
@@ -63,8 +73,9 @@ are paired off in a 1-1 manner.
 
     my $copyright = Debian::LicenseReconcile::CopyrightDatum->new($text);
 
-    if ($copyright->contains($copyright2)) {
-        ...
+    my $explanation = "";
+    if (not $copyright->contains($copyright2, \$explanation)) {
+        warn $explanation;
     }
 
 =head1 SUBROUTINES/METHODS
@@ -78,6 +89,8 @@ This constructor parses a copyright string.
 This method returns a boolean indicating whether the object contains the argument.
 The method will respect the argument if it is a
 L<Debian::LicenseReconcile::CopyrightDatum> and otherwise stringify and parse it.
+It may also take an optional reference. If this is set on failing to
+veryify containment the reason found will be placed in that reference.
 
 =head2 copyright_holders 
 
