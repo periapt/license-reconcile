@@ -11,6 +11,9 @@ sub new {
     return $self;
 }
 
+sub contains {return 1}
+sub copyright_holders {}
+
 =head1 NAME
 
 Debian::LicenseReconcile::CopyrightDatum - copyright data as an object
@@ -46,6 +49,18 @@ are paired off in a 1-1 manner.
 =head1 SUBROUTINES/METHODS
 
 =head2 new
+
+This constructor parses a copyright string.
+
+=head2 contains
+
+This method returns a boolean indicating whether the object contains the argument.
+The method will respect the argument if it is a
+L<Debian::LicenseReconcile::CopyrightDatum> and otherwise stringify and parse it.
+
+=head2 copyright_holders 
+
+This method returns the list of copyright holders parsed from the original string.
 
 =head1 AUTHOR
 
