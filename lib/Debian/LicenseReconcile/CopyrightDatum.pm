@@ -25,11 +25,18 @@ sub _parse {
 sub contains {
     my $self = shift;
     my $other = shift;
-    if (blessed $other ne 'Debian::LicenseReconcile::CopyrightDatum') {
-        $other = Debian::LicenseReconcile::CopyrightDatum->new("$other");
-    }
     my $msg_ref = shift;
     undef $msg_ref if not ref $msg_ref;
+    if (not defined $other) {
+        if ($msg_ref) {
+            $$msg_ref = 'The other copyright data was undefined.';
+        }
+        return 0;
+    }
+    my $other_class = blessed $other || '';
+    if ($other_class ne 'Debian::LicenseReconcile::CopyrightDatum') {
+        $other = Debian::LicenseReconcile::CopyrightDatum->new("$other");
+    }
     return 1;
 }
 
