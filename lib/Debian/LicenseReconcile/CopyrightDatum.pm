@@ -4,6 +4,16 @@ use 5.006;
 use strict;
 use warnings;
 use Scalar::Util qw(blessed);
+use Readonly;
+
+# We allow the copyright to be given in square brackets.
+Readonly my $SQBR_RE => qr{
+    \A
+    \[
+    ([^]]*)
+    \]
+    \z
+}xms;
 
 sub new {
     my $class = shift;
@@ -19,6 +29,9 @@ sub new {
 sub _parse {
     my $self = shift;
     my $text = shift;
+    if ($text =~ $SQBR_RE) {
+        $text = $1;
+    }
     return;
 }
     
@@ -37,6 +50,17 @@ sub contains {
     if ($other_class ne 'Debian::LicenseReconcile::CopyrightDatum') {
         $other = Debian::LicenseReconcile::CopyrightDatum->new("$other");
     }
+
+    # 1.) Get lists of our and their copyright holders.
+    # 2.) If we have less than theirs that is an easy fail.
+    # 3.) Match off any that are exact matches and check those
+    # 4.) Now create a mapping from Levenshtein distances to sets of pairs
+    # of copyright holders. However if a holder is equidistant between
+    # two oppisate holders then we immediately reject the whole
+    # match as being ambiguous.
+    # 5.) If we get this far then working from the shortest Levenshtein
+    # distances up, we can pair off copyright holders and run the other
+    # checks.
     return 1;
 }
 

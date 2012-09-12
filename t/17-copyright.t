@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 
@@ -14,6 +14,8 @@ my $test = 'blah';
 my $copyright = \'blah';
 is($d->contains($copyright, \$test), 1, 'actually should be NO');
 is($$copyright, 'blah');
+is($test, 'blah');
+is($d->contains('[]', \$test), 1, 'square brackets');
 is($test, 'blah');
 
 undef $copyright;
