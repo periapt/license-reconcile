@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw(blessed);
 use Readonly;
+use Set::IntSpan;
 
 # We allow the copyright to be given in square brackets.
 Readonly my $SQBR_RE => qr{
@@ -13,6 +14,20 @@ Readonly my $SQBR_RE => qr{
     ([^]]*)
     \]
     \z
+}xms;
+
+Readonly my $NL_RE => qr{
+    \s*
+    $
+    \s*
+}xms;
+
+# We regard each line as a Set::IntSpan run list followed by free text.
+Readonly my $LINE_RE => qr{
+    \A                          # start of string
+    ([0-9-,\s\(\)]*)            # Set::IntSpan
+    (.*\S)                      # free text copyright holder
+    \z                          # end of string
 }xms;
 
 sub new {
@@ -31,6 +46,11 @@ sub _parse {
     my $text = shift;
     if ($text =~ $SQBR_RE) {
         $text = $1;
+    }
+    foreach my $line (split $NL_RE, $text) {
+        if ($line =~ $LINE_RE) {
+            $self->{$2} = Set::IntSpan->new($1);
+        }
     }
     return;
 }

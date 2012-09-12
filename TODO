@@ -19,3 +19,7 @@ but the wrapper does not return it
 13.) file permissions rule clause
 14.) allow rules to read only the first N bytes - but benchmark
 15.) floundered on bwctl format spec - why
+16.) Until someone writes Set::YearSpan (based on Set::IntSpan but extended
+to cope with abbreviated 2-digit years) years always need to be expressed
+as four digits. This may be a good thing actually, but the limitation
+should be documented.
