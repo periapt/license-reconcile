@@ -1,22 +1,23 @@
 #!/usr/bin/perl
 
-use Test::More tests => 26;
+use Test::More tests => 32;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 
 my $d = Debian::LicenseReconcile::CopyrightDatum->new;
 isa_ok($d, 'Debian::LicenseReconcile::CopyrightDatum');
 is($d->contains($d), 1, 'contains');
+is($d->contains($d, 'no better than a default'), 1, 'contains');
 my @dk = $d->copyright_holders;
 cmp_deeply(\@dk, [], 'copyright holders');
 is($d->years(''), undef, 'years');
 my $test = 'blah';
 my $copyright = \'blah';
-is($d->contains($copyright, \$test), 1, 'actually should be NO');
+is($d->contains($copyright, \$test), 0);
 is($$copyright, 'blah');
-is($test, 'blah');
+like($test, qr/1 cannot be fitted into 0:/);
 is($d->contains('[]', \$test), 1, 'square brackets');
-is($test, 'blah');
+like($test, qr/1 cannot be fitted into 0:/);
 
 undef $copyright;
 is($d->contains($copyright, \$test), 0, 'undefined other');
@@ -54,4 +55,15 @@ my $woo_years = $d5->years('Woo Goo & Co')->elements;
 cmp_deeply($woo_years,[1996,1997,1998,2001], 'woo years');
 my $blah_years = $d5->years('Blah Wah Ltd')->elements;
 cmp_deeply($blah_years,[1997,1999,2000,2001,2002,2003,2004,2005,2006], 'blah years');
+
+TODO: {
+    local $TODO = "The answer should be no.";
+    is($d5->contains('2005, Microflop Inc'), 0);
+};
+
+my $test2='haha';
+is($d5->contains('1997,1999, Blah Wah Ltd', \$test2), 1);
+is($test2, 'haha');
+is($d5->contains('1998, Blah Wah Ltd', \$test2), 0);
+is($test2, 'For copyright holder Blah Wah Ltd the years 1998 cannot be fitted into 1997,1999-2006.');
 

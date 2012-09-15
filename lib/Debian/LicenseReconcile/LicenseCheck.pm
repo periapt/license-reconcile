@@ -15,6 +15,9 @@ Readonly my %LICENSE_MAPPING => (
     'GPL (v2 or later)' => 'GPL-2+',
     'LGPL (v2)' => 'LGPL',
     'zlib/libpng' => 'zlib/libpng',
+    'BSD (4 clause)' => 'BSD-4-clause',
+    'BSD (2 clause)' => 'BSD-2-clause',
+    'BSD (3 clause)' => 'BSD-3-clause',
 );
 
 Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf', '--copyright');

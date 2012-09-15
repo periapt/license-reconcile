@@ -60,12 +60,8 @@ sub contains {
     my $other = shift;
     my $msg_ref = shift;
     undef $msg_ref if not ref $msg_ref;
-    if (not defined $other) {
-        if ($msg_ref) {
-            $$msg_ref = 'The other copyright data was undefined.';
-        }
-        return 0;
-    }
+    return _msg($msg_ref, 'The other copyright data was undefined.')
+        if not defined $other;
     my $other_class = blessed $other || '';
     if ($other_class ne 'Debian::LicenseReconcile::CopyrightDatum') {
         $other = Debian::LicenseReconcile::CopyrightDatum->new("$other");
@@ -81,7 +77,40 @@ sub contains {
     # 5.) If we get this far then working from the shortest Levenshtein
     # distances up, we can pair off copyright holders and run the other
     # checks.
+    my $our_data = $self->as_hash;
+    my $their_data = $other->as_hash;
+    my $our_size = keys %$our_data;
+    my $their_size = keys %$their_data;
+    if ($our_size < $their_size) {
+        my $our_list = join '|', keys %$our_data;
+        my $their_list = join '|', keys %$their_data;
+        return _msg($msg_ref, "$their_size cannot be fitted into $our_size: ($their_list) versus ($our_list)");
+    }
+
+    my @their_keys = keys %$their_data;
+    foreach my $key (@their_keys) {
+        if (exists $our_data->{$key}) {
+            my $our_years = delete $our_data->{$key};
+            my $their_years = delete $their_data->{$key};
+            if (not $their_years le $our_years) {
+                return _msg($msg_ref,
+                    "For copyright holder $key the years $their_years cannot be fitted into $our_years.");
+            }
+        }
+    }
+
+    my %distance_to_matches = ();
+
     return 1;
+}
+
+sub _msg {
+    my $msg_ref = shift;
+    my $text = shift;
+    if ($msg_ref) {
+        $$msg_ref = $text;
+    }
+    return 0;
 }
 
 sub copyright_holders {
@@ -94,6 +123,12 @@ sub years {
     my $holder = shift;
     return if not exists $self->{$holder};
     return $self->{$holder};
+}
+
+sub as_hash {
+    my $self = shift;
+    my %hash = %$self;
+    return \%hash;
 }
 
 =head1 NAME
@@ -151,6 +186,10 @@ This method returns the list of copyright holders parsed from the original strin
 
 Given an exactly matching copyright holder this returns the set of years
 as an L<Set::IntSpan> object.
+
+=head2 as_hash
+
+Returns a hash reference of the objects data.
 
 =head1 AUTHOR
 
