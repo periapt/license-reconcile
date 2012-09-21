@@ -16,18 +16,27 @@ use Class::XSAccessor
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, ref($class)||$class;
+    my %args = @_;
+    my $self = bless \%args, ref($class)||$class;
     $self->_set_width(distance($self->theirs, $self->ours));
     return $self;
 }
-
-use overload '<=>' => \&_my_cmp;
 
 sub _my_cmp {
     my $a = shift;
     my $b = shift;
     return $a->width <=> $b->width;
 }
+
+sub touches {
+    my $self = shift;
+    my $other = shift;
+    return 1 if $self->ours eq $other->ours;
+    return 1 if $self->theirs eq $other->theirs;
+    return 0;
+}
+
+use overload '<=>' => \&_my_cmp;
 
 =head1 NAME
 

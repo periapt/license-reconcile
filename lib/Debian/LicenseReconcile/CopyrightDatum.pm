@@ -7,7 +7,7 @@ use Scalar::Util qw(blessed);
 use Readonly;
 use Set::IntSpan;
 use Debian::LicenseReconcile::CopyrightDatum::Holder;
-use List::MoreUtils qw(part pairwise);
+use List::MoreUtils qw(part);
 
 # We allow the copyright to be given in square brackets.
 Readonly my $SQBR_RE => qr{
@@ -82,8 +82,7 @@ sub contains {
     my $our_data = $self->as_hash;
     my $their_data = $other->as_hash;
     my @their_keys = keys %$their_data;
-    my @our_keys = keys %$our_data;
-    my $our_size = @our_keys;
+    my $our_size = keys %$our_data;
     my $their_size = @their_keys;
     if ($our_size < $their_size) {
         my $our_list = join '|', keys %$our_data;
@@ -102,18 +101,22 @@ sub contains {
         }
     }
 
-    my @pairs = sort {$a <=> $b} pairwise {
-        Debian::LicenseReconcile::CopyrightDatum::Holder->new(
-            theirs=>$a,
-            ours=>$b,
-        )
-    } @their_keys, @our_keys;
+    my @pairs =
+        sort {$a <=> $b}
+        map {
+            my $ours = $_;
+            map {
+                Debian::LicenseReconcile::CopyrightDatum::Holder->new(
+                    theirs=>$_,
+                    ours=>$ours
+                )
+            }
+            keys %$their_data
+        }
+        keys %$our_data;
     while(@pairs) {
         my $subject = $pairs[0];
-        my ($like_subject, $unlike_subject) =
-            part {
-                $subject->ours eq $_->ours or $subject->theirs eq $_->theirs
-            } @pairs;
+        my ($like_subject, $unlike_subject) = part {not $subject->touches($_)} @pairs;
         if (scalar @$like_subject > 1
             and $subject->width==$like_subject->[1]->width) {
                 # report ambiguity
@@ -124,7 +127,7 @@ sub contains {
         my $their_years = delete $their_data->{$their_key};
         if (not $their_years le $our_years) {
             return _msg($msg_ref,
-                "For copyright holder '$their_key' (matched against '$our_key') the years $their_years cannot be fitted into $our_years.");
+                "For copyright holder '$their_key' (which looks like '$our_key') the years $their_years cannot be fitted into $our_years.");
         }
         @pairs = @$unlike_subject;
     }

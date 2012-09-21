@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 
@@ -56,14 +56,13 @@ cmp_deeply($woo_years,[1996,1997,1998,2001], 'woo years');
 my $blah_years = $d5->years('Blah Wah Ltd')->elements;
 cmp_deeply($blah_years,[1997,1999,2000,2001,2002,2003,2004,2005,2006], 'blah years');
 
-TODO: {
-    local $TODO = "The answer should be no.";
-    is($d5->contains('2005, Microflop Inc'), 0);
-};
-
 my $test2='haha';
+is($d5->contains('2005, Microflop Inc', \$test2), 0);
+is($test2, "For copyright holder 'Microflop Inc' (which looks like 'Woo Goo & Co') the years 2005 cannot be fitted into 1996-1998,2001.");
+
+$test2='haha';
 is($d5->contains('1997,1999, Blah Wah Ltd', \$test2), 1);
 is($test2, 'haha');
 is($d5->contains('1998, Blah Wah Ltd', \$test2), 0);
-is($test2, 'For copyright holder Blah Wah Ltd the years 1998 cannot be fitted into 1997,1999-2006.');
+is($test2, "For copyright holder 'Blah Wah Ltd' the years 1998 cannot be fitted into 1997,1999-2006.");
 
