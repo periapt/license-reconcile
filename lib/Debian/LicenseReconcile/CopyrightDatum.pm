@@ -111,14 +111,13 @@ sub contains {
                     ours=>$ours
                 )
             }
-            keys %$their_data
+            keys %$their_data # note could be a subset of @their_keys
         }
         keys %$our_data;
     while(@pairs) {
         my $subject = $pairs[0];
         my ($like_subject, $unlike_subject) = part {not $subject->touches($_)} @pairs;
-        if (scalar @$like_subject > 1
-            and $subject->width==$like_subject->[1]->width) {
+        if ($subject->is_ambiguous($like_subject)) {
                 # report ambiguity
         }
         my $our_key = $subject->ours;

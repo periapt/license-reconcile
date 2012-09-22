@@ -36,6 +36,13 @@ sub touches {
     return 0;
 }
 
+sub is_ambiguous {
+    my $self = shift;
+    my $like_subject = shift;
+    return 0 if scalar @$like_subject <= 1;
+    return $self->width==$like_subject->[1]->width;
+}
+
 use overload '<=>' => \&_my_cmp;
 
 =head1 NAME
@@ -70,6 +77,18 @@ So these objects have C<ours>, C<theirs> and C<width> fields.
 The comparison just compares by the distance field.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 new
+
+=head2 width
+
+=head2 ours 
+
+=head2 theirs
+
+=head2 touches
+
+=head2 is_ambiguous
 
 =head1 AUTHOR
 
