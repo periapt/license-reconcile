@@ -7,7 +7,8 @@ use Debian::LicenseReconcile::Errors;
 
 sub new {
     my $class = shift;
-    my $self = {};
+    my $patterns = shift;
+    my $self = $patterns;
     bless $self, $class;
     return $self;
 }
@@ -16,16 +17,26 @@ sub check {
     my $self = shift;
     my $subject = shift;
     my $target = shift;
+    my $pattern = $target->{pattern};
     my $license = $subject->{license};
 
-    if ($license) {
-        my $target_license = $target->{license};
-        $target_license =~ s{\n.*\z}{}xms;
-        if ($license ne $target_license) {
-            my $msg = "File $subject->{file} has license $license which does not match $target_license.";
+    if ($subject->{license}) {
+        my $target_license = $self->{$pattern}->{license};
+        if ($subject->{license} ne $target_license) {
+            my $msg = "File $subject->{file} has license $subject->{license} which does not match $target_license.";
             Debian::LicenseReconcile::Errors->push(
                 test => 'License mismatch',
                 msg => $msg,
+            );
+        }
+    }
+    if ($subject->{copyright}) {
+        my $target_copyright = $self->{$pattern}->{copyright};
+        my $msg = "";
+        if (not $target_copyright->contains($subject->{copyright}, \$msg)) {
+            Debian::LicenseReconcile::Errors->push(
+                test => 'Copyright mismatch',
+                msg => "File $subject->{file}: $msg",
             );
         }
     }

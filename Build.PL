@@ -22,6 +22,7 @@ my $builder = Module::Build->new(
         'Dpkg::Version' => 0,
         'Parse::DebianChangelog' => 0,
         'Email::Address' => 0,
+        'List::MoreUtils'=>0,
         'Readonly'=>0,
         'File::Slurp' => 0,
         'File::MMagic' => 0,

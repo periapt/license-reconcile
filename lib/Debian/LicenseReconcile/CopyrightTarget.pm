@@ -7,6 +7,7 @@ use Debian::LicenseReconcile::Errors;
 use Debian::Copyright;
 use Readonly;
 use Debian::LicenseReconcile::Utils qw(get_files);
+use Debian::LicenseReconcile::CopyrightDatum;
 use File::FnMatch qw(:fnmatch);
 
 Readonly my $SPACE => qr{\s+}xms;
@@ -35,6 +36,27 @@ sub parse {
     }
     $self->{files} = $parser->files;
     return $self;
+}
+
+sub patterns {
+    my $self = shift;
+    my %patterns;
+    foreach my $pattern ($self->{files}->Keys) {
+        my @patterns = split $SPACE, $pattern;
+        foreach my $key (@patterns) {
+            my $value = $self->{files}->Values($key);
+            my $target_license = $value->License;
+            $target_license =~ s{\n.*\z}{}xms;
+            my $target_copyright = Debian::LicenseReconcile::CopyrightDatum->new(
+                $value->Copyright
+            );
+            $patterns{$key} = {
+                license => $target_license,
+                copyright=> $target_copyright,
+            };
+        }
+    }
+    return \%patterns;
 }
 
 sub map_directory {
@@ -105,6 +127,10 @@ reports an error via L<Debian::LicenseReconcile::Errors>.
 Takes a directory path and attempts to map the contents of that directory
 onto the copyright specification. It returns a hash reference containing that
 mapping.
+
+=head2 patterns 
+
+Returns the file to License and Copyright mapping.
 
 =head1 AUTHOR
 

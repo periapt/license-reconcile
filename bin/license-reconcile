@@ -84,7 +84,7 @@ if ($copyright_target->parse($COPYRIGHT_TEXT)) {
         }
     }
 
-    my $reconcile = Debian::LicenseReconcile->new;
+    my $reconcile = Debian::LicenseReconcile->new($copyright_target->patterns);
     my %file_checked = ();
     foreach my $filter_name (@filters) {
         my $class;

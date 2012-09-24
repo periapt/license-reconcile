@@ -1,6 +1,4 @@
-1.) Debian::LicenseReconcile must cache the copyright and license objects
-keyed by pattern. It should do this at startup which will require a slight
-change of interface.
+*) reconcile bwctl and mysql
 2.) Need to treat UNKNOWN license differently. We have no license to check
 and must not generate an error for a license mismatch. But the copyright is
 still checkable.
