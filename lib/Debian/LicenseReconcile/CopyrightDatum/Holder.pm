@@ -43,6 +43,11 @@ sub is_ambiguous {
     return $self->width==$like_subject->[1]->width;
 }
 
+sub relative_width {
+    my $self = shift;
+    return 2.0*($self->width)/((length $self->ours) + (length $self->theirs));
+}
+
 use overload '<=>' => \&_my_cmp;
 
 =head1 NAME
@@ -89,6 +94,8 @@ The comparison just compares by the distance field.
 =head2 touches
 
 =head2 is_ambiguous
+
+=head2 relative_width
 
 =head1 AUTHOR
 

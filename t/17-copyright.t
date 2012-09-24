@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 37;
+use Test::More tests => 39;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 
@@ -58,7 +58,11 @@ cmp_deeply($blah_years,[1997,1999,2000,2001,2002,2003,2004,2005,2006], 'blah yea
 
 my $test2='haha';
 is($d5->contains('2005, Microflop Inc', \$test2), 0);
-is($test2, "For copyright holder 'Microflop Inc' (which looks like 'Woo Goo & Co') the years 2005 cannot be fitted into 1996-1998,2001.");
+is($test2, "Trying to match 'Microflop Inc' against 'Woo Goo & Co' but it does not look like a good match.");
+
+$test2='haha';
+is($d5->contains('2005, WiooGoo $ Coc', \$test2), 0);
+is($test2, "For copyright holder 'WiooGoo \$ Coc' (which looks like 'Woo Goo & Co') the years 2005 cannot be fitted into 1996-1998,2001.");
 
 $test2='haha';
 is($d5->contains('1997,1999, Blah Wah Ltd', \$test2), 1);

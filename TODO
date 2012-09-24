@@ -19,6 +19,8 @@ should be documented.
 9.) The empty rule really screws up. License and Copyright should default to that
 obtained by licensecheck
 ------------------------------------------------------------------------------
+*.) Max relative width should be configurable
+*.) Play with Smart::Comments
 4.) Need a Dh_Sequence as well.
 11.) exclude files from mapping configurably
 6.) Could do with a man page for the config file format.

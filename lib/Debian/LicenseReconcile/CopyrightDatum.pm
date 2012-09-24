@@ -32,6 +32,8 @@ Readonly my $LINE_RE => qr{
     \z                          # end of string
 }xms;
 
+Readonly my $MAX_RELATIVE_WIDTH => 0.33;
+
 sub new {
     my $class = shift;
     my $self = {};
@@ -114,6 +116,15 @@ sub contains {
             keys %$their_data # note could be a subset of @their_keys
         }
         keys %$our_data;
+    if (@pairs) {
+        my $best_case = $pairs[0];
+        if ($best_case->relative_width > $MAX_RELATIVE_WIDTH) {
+            my $ours = $best_case->ours;
+            my $theirs = $best_case->theirs;
+            return _msg($msg_ref,
+                "Trying to match '$theirs' against '$ours' but it does not look like a good match.");
+        }
+    }
     while(@pairs) {
         my $subject = $pairs[0];
         my ($like_subject, $unlike_subject) = part {not $subject->touches($_)} @pairs;
