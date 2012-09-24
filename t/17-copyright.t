@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 33;
+use Test::More tests => 37;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 
@@ -65,4 +65,23 @@ is($d5->contains('1997,1999, Blah Wah Ltd', \$test2), 1);
 is($test2, 'haha');
 is($d5->contains('1998, Blah Wah Ltd', \$test2), 0);
 is($test2, "For copyright holder 'Blah Wah Ltd' the years 1998 cannot be fitted into 1997,1999-2006.");
+
+my $text2=<<'EOS';
+ 1997, 1999-2006, Blah1 Wah Ltd
+ 1997, 1999-2006, Blah Wah8 Ltd
+EOS
+$test2='haha';
+is($d5->contains($text2, \$test2), 0);
+is($test2, "Was trying to match 'Blah1 Wah Ltd' to 'Blah Wah Ltd', but 'Blah Wah8 Ltd' would match as well so giving up.");
+
+my $text3=<<'EOS';
+ 1997, 1999-2006, Blah4 Wah Ltd
+ 1996-1998, 2001, Blah WaT Ltd
+EOS
+my $d6=Debian::LicenseReconcile::CopyrightDatum->new($text3);
+$test2='haha';
+is($d6->contains($text, \$test2), 0);
+is($test2, "Was trying to match 'Blah Wah Ltd' to 'Blah4 Wah Ltd', but 'Blah WaT Ltd' would be matched as well so giving up.");
+
+
 

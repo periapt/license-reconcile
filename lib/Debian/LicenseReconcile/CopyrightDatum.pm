@@ -118,7 +118,20 @@ sub contains {
         my $subject = $pairs[0];
         my ($like_subject, $unlike_subject) = part {not $subject->touches($_)} @pairs;
         if ($subject->is_ambiguous($like_subject)) {
-                # report ambiguity
+                my $friend = $like_subject->[1];
+                my $subject_ours = $subject->ours;
+                my $friend_ours = $friend->ours;
+                my $subject_theirs = $subject->theirs;
+                my $friend_theirs = $friend->theirs;
+                if ($subject_ours eq $friend_ours) {
+                    return _msg($msg_ref,
+                        "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_theirs' would match as well so giving up."); 
+                }
+                if ($subject_theirs eq $friend_theirs) {
+                    return _msg($msg_ref,
+                        "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_ours' would be matched as well so giving up."); 
+                }
+                die "SHOULD NOT GET HERE";
         }
         my $our_key = $subject->ours;
         my $their_key = $subject->theirs;
