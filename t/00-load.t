@@ -1,11 +1,12 @@
 #!perl 
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Test::Compile;
 
 BEGIN {
     use_ok( 'Debian::LicenseReconcile' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::Errors' ) || print "Bail out!\n";
+    use_ok( 'Debian::LicenseReconcile::App' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::LicenseCheck' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::FormatSpec' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::CopyrightTarget' ) || print "Bail out!\n";

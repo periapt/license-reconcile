@@ -1,18 +1,18 @@
-*) reconcile bwctl and mysql
+1) reconcile bwctl and mysql
 2.) Need to treat UNKNOWN license differently. We have no license to check
 and must not generate an error for a license mismatch. But the copyright is
 still checkable.
 3.) There is a bug in the licensecheck handling
 licensecheck gets the results for cmd-line-utils/libedit/tty.c
 but the wrapper does not return it
-4) config should be below debian/source actually and we should be cleverer about
-the name.
-5.) app module
-6.) test coverage
-7.) debian packaging
-9.) The empty rule really screws up. License and Copyright should default to that
+4.) app module
+5.) test coverage
+6.) debian packaging
+8.) The empty rule really screws up. License and Copyright should default to that
 obtained by licensecheck
 ------------------------------------------------------------------------------
+*) config should be below debian/source actually and we should be cleverer about
+the name.
 *.) Max relative width should be configurable
 *.) Play with Smart::Comments
 4.) Need a Dh_Sequence as well.
