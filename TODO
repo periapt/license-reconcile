@@ -10,10 +10,6 @@ the name.
 5.) app module
 6.) test coverage
 7.) debian packaging
-8.) Until someone writes Set::YearSpan (based on Set::IntSpan but extended
-to cope with abbreviated 2-digit years) years always need to be expressed
-as four digits. This may be a good thing actually, but the limitation
-should be documented.
 9.) The empty rule really screws up. License and Copyright should default to that
 obtained by licensecheck
 ------------------------------------------------------------------------------

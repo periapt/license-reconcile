@@ -332,13 +332,14 @@ relevant to this filter.
 
 =head1 LIMITATIONS
 
-Currently I am ignoring the copyright data and concentrating on the license data.
-
-Also the DEP-5 specification is subtly different from the file glob specification.
+The DEP-5 specification is subtly different from the file glob specification.
 Since the L<File::FnMatch> module is the only practical implementation there
 is little that can be done. The consequence is that attempting to specify that a
-file name should contain '[' or ']' in C<debian/copyright> is unlikely to work
-correctly.
+file name should contain '[' and later a ']' in C<debian/copyright> is unlikely
+to work correctly.
+
+In copyright parsing years cannot be expressed in an abbreviated two digit form.
+This is probably a good thing, but it it will surely cause an issue at some point.
 
 =head1 AUTHOR
 
