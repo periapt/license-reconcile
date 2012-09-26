@@ -3,23 +3,14 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
-use File::Slurp;
-use Readonly;
-use Debian::LicenseReconcile::Errors;
-use Debian::LicenseReconcile::FormatSpec;
-use Debian::LicenseReconcile::CopyrightTarget;
-use Debian::LicenseReconcile::LicenseCheck;
-use Debian::LicenseReconcile;
-use Parse::DebianChangelog;
-use UNIVERSAL::require;
-use Config::Any;
+use Debian::LicenseReconcile::App;
 
 my $man = 0;
 my $help = 0;
 my $quiet = 0;
 my $display_mapping = 0;
 my $directory = ".";
-my @filters = qw(Rules Std Shebang ChangeLog Default);
+my @filters = qw(Rules Std Shebang ChangeLog Default~Std);
 my @filters_override = ();
 my $config_file = 'debian/license-reconcile.yml';
 my $changelog_file = 'debian/changelog';
@@ -53,95 +44,18 @@ if (@filters_override) {
     @filters = @filters_override;
 }
 
-Readonly my $COPYRIGHT_TEXT => scalar read_file($copyright);
-
-Readonly my $CHANGELOG => Parse::DebianChangelog->init({infile=>$changelog_file});
-
-if ($format_spec) {
-        Debian::LicenseReconcile::FormatSpec->check($COPYRIGHT_TEXT);
-}
-
-my $CONFIG = Config::Any->load_files({
-    files=>[$config_file],
-    use_ext=>1,
-    flatten_to_hash=>1,
-})->{$config_file};
-
-Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new(
-    $directory,
-    $CONFIG->{LicenseCheck},
-    #get_config('LicenseCheck'),
+my $app = Debian::LicenseReconcile::App->new(
+    copyright           => $copyright,
+    changelog_file      => $changelog_file,
+    format_spec         => $format_spec,
+    config_file         => $config_file,
+    directory           => $directory,
+    quiet               => $quiet,
+    display_mapping     => $display_mapping,
+    filters             => \@filters,
+    format_spec         => $format_spec,
 );
-
-my $copyright_target = Debian::LicenseReconcile::CopyrightTarget->new;
-if ($copyright_target->parse($COPYRIGHT_TEXT)) {
-
-    my $file_mapping = $copyright_target->map_directory($directory);
-
-    if ($display_mapping) {
-        foreach my $file (keys %$file_mapping) {
-            print "$file: $file_mapping->{$file}->{pattern}\n";
-        }
-    }
-
-    my $reconcile = Debian::LicenseReconcile->new($copyright_target->patterns);
-    my %file_checked = ();
-    foreach my $filter_name (@filters) {
-        my $class;
-        ($class, $filter_name) = parse_filter_name($filter_name);
-        $class->require;
-        my @files_remaining = grep {not exists $file_checked{$_}} keys %$file_mapping;
-        my $test = $class->new(
-            directory=>$directory,
-            files_remaining=>\@files_remaining,
-            config=>$CONFIG->{$filter_name},
-            changelog=>$CHANGELOG,
-            licensecheck=>$LICENSECHECK,
-            name=>$filter_name,
-        );
-        foreach my $titbit ($test->get_info) {
-            next if $file_checked{$titbit->{file}};
-            $file_checked{$titbit->{file}} = 1;
-            if (exists $file_mapping->{$titbit->{file}}) {
-                $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
-            }
-            else {
-                Debian::LicenseReconcile::Errors->push(
-                    test => 'File mismatch',
-                    msg => "Filter $filter_name found $titbit->{file} which was not in the file mapping. This probably implies a bug in the filter.",
-                );
-            }
-        }
-    }
-
-}
-
-if (not $quiet) {
-    foreach my $error (Debian::LicenseReconcile::Errors->list) {
-        warn "$error->{test}: $error->{msg}";
-    }
-}
-
-exit(Debian::LicenseReconcile::Errors->how_many > 0 ? 1 : 0);
-
-sub get_config {
-    my $tag = shift;
-    return $CONFIG->{$tag} if exists $CONFIG->{$tag};
-    return {};
-}
-
-sub parse_filter_name {
-    my $filter_name = shift;
-    my $class = "Debian::LicenseReconcile::Filter::";
-    if ($filter_name =~ m{\A(\w+)~(\w+)\z}xms) {
-        $class .= $2;
-        $filter_name = $1;
-    }
-    else {
-        $class .= $filter_name;
-    }
-    return $class, $filter_name;
-}
+exit($app->run);
 
 =head1 NAME
 
