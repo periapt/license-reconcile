@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 15;
+use Test::More tests => 19;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::App;
@@ -31,11 +31,9 @@ isa_ok($app3, 'Debian::LicenseReconcile::App');
 my $target3 = $app3->_read_copyright_file;
 is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
 my @list = Debian::LicenseReconcile::Errors->list;
+my $error1 = 'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/';
 cmp_deeply(\@list, [
-    {
-        test=>'FormatSpec',
-        msg=>'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/',
-    },
+    { test=>'FormatSpec', msg=>$error1, },
 ], 'initial state');
 isa_ok($target3, 'Debian::LicenseReconcile::CopyrightTarget');
 
@@ -47,17 +45,26 @@ isa_ok($app4, 'Debian::LicenseReconcile::App');
 my $target4 = $app4->_read_copyright_file;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
+my $error2 = 'Invalid field given (Flossy) at /usr/local/share/perl/5.14.2/Debian/Copyright.pm line 141
+';
 cmp_deeply(\@list, [
-    {
-        test=>'FormatSpec',
-        msg=>'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/',
-    },
-    {
-        test=>'CopyrightParsing',
-        msg=>'Invalid field given (Flossy) at /usr/local/share/perl/5.14.2/Debian/Copyright.pm line 141
-',
-    },
+    { test=>'FormatSpec', msg=>$error1, },
+    { test=>'CopyrightParsing', msg=>$error2, },
 ]);
 is($target4, undef);
 
+my $app5 = Debian::LicenseReconcile::App->new(
+    changelog_file=>'t/data/example/debian/changelog',
+);
+isa_ok($app5, 'Debian::LicenseReconcile::App');
+my $target5 = $app5->_parse_changelog;
+is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    { test=>'FormatSpec', msg=>$error1, },
+    { test=>'CopyrightParsing', msg=>$error2, },
+]);
+isa_ok($target5, 'Parse::DebianChangelog');
 
+# t/data/example/debian/changelog
+# t/data/example/debian/changelog
