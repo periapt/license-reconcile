@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 19;
+use Test::More tests => 23;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::App;
@@ -66,5 +66,16 @@ cmp_deeply(\@list, [
 ]);
 isa_ok($target5, 'Parse::DebianChangelog');
 
-# t/data/example/debian/changelog
-# t/data/example/debian/changelog
+my $app6 = Debian::LicenseReconcile::App->new(
+    config_file =>'t/data/empty.yml',
+);
+isa_ok($app6, 'Debian::LicenseReconcile::App');
+my $target6 = $app6->_parse_config;
+is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    { test=>'FormatSpec', msg=>$error1, },
+    { test=>'CopyrightParsing', msg=>$error2, },
+]);
+cmp_deeply($target6, undef);
+
