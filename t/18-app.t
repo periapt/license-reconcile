@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 11;
+use Test::More tests => 15;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::App;
@@ -38,3 +38,26 @@ cmp_deeply(\@list, [
     },
 ], 'initial state');
 isa_ok($target3, 'Debian::LicenseReconcile::CopyrightTarget');
+
+my $app4 = Debian::LicenseReconcile::App->new(
+    copyright=>'t/data/flossy',
+    format_spec=>1,
+);
+isa_ok($app4, 'Debian::LicenseReconcile::App');
+my $target4 = $app4->_read_copyright_file;
+is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    {
+        test=>'FormatSpec',
+        msg=>'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/',
+    },
+    {
+        test=>'CopyrightParsing',
+        msg=>'Invalid field given (Flossy) at /usr/local/share/perl/5.14.2/Debian/Copyright.pm line 141
+',
+    },
+]);
+is($target4, undef);
+
+
