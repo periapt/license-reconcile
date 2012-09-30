@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 23;
+use Test::More tests => 31;
 use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::App;
@@ -77,5 +77,32 @@ cmp_deeply(\@list, [
     { test=>'FormatSpec', msg=>$error1, },
     { test=>'CopyrightParsing', msg=>$error2, },
 ]);
-cmp_deeply($target6, undef);
+cmp_deeply($target6, {licensecheck=>{}});
+
+my $app7 = Debian::LicenseReconcile::App->new(
+    config_file =>'t/data/almost.yml',
+);
+isa_ok($app7, 'Debian::LicenseReconcile::App');
+my $target7 = $app7->_parse_config;
+is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    { test=>'FormatSpec', msg=>$error1, },
+    { test=>'CopyrightParsing', msg=>$error2, },
+]);
+cmp_deeply($target7, {licensecheck=>{},Rules=>[],Blah=>[undef]});
+
+my $app8 = Debian::LicenseReconcile::App->new(
+    directory=>'t/data/example',
+);
+isa_ok($app8, 'Debian::LicenseReconcile::App');
+my $target8 = $app8->_build_licensecheck($target7);
+is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
+@list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    { test=>'FormatSpec', msg=>$error1, },
+    { test=>'CopyrightParsing', msg=>$error2, },
+]);
+isa_ok($target8, 'Debian::LicenseReconcile::LicenseCheck');
+
 

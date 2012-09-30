@@ -27,6 +27,10 @@ use Parse::DebianChangelog;
 use UNIVERSAL::require;
 use Config::Any;
 
+Readonly my %CONFIG_HASHES => (
+    licensecheck => 1,
+);
+
 sub _read_copyright_file {
     my $self = shift;
     my $copyright_text = scalar read_file($self->copyright);
@@ -51,11 +55,26 @@ sub _parse_changelog {
 
 sub _parse_config {
     my $self = shift;
-    return Config::Any->load_files({
+    my $config = Config::Any->load_files({
         files=>[$self->config_file],
         use_ext=>1,
         flatten_to_hash=>1,
     })->{$self->config_file};
+    if (not defined $config) {
+        $config = {licensecheck=>{}};
+    }
+    foreach my $key (keys %$config, keys %CONFIG_HASHES) {
+        if ($CONFIG_HASHES{$key}) {
+            if (ref $config->{$key} ne 'HASH') {
+                $config->{$key}={};
+            }
+            next;
+        }
+        if (ref $config->{$key} ne 'ARRAY') {
+            $config->{$key}=[];
+        }
+    }
+    return $config;
 }
 
 sub _build_licensecheck {
