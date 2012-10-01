@@ -92,7 +92,7 @@ sub _build_file_mapping {
     my $file_mapping = $copyright_target->map_directory($self->directory);
 
     if ($self->display_mapping) {
-        foreach my $file (keys %$file_mapping) {
+        foreach my $file (sort keys %$file_mapping) {
             print "$file: $file_mapping->{$file}->{pattern}\n";
         }
     }

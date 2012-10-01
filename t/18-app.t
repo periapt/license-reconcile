@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 34;
+use Test::More tests => 37;
 use Test::Deep;
 use Test::Output;
 use Debian::LicenseReconcile::Errors;
@@ -133,5 +133,31 @@ cmp_deeply($target9, {
     'debian/control'=>$COPYRIGHT_DATA3,
     'debian/copyright'=>$COPYRIGHT_DATA3,
 });
+
+my $app10 = Debian::LicenseReconcile::App->new(
+    directory=>'t/data/example',
+    display_mapping => 1,
+);
+isa_ok($app10, 'Debian::LicenseReconcile::App');
+my $target10 = undef;
+my $expected = 'a/0.h: a/*.h
+a/1.h: a/*.h
+a/2.h: a/*.h
+a/3.h: a/*.h
+a/base: *
+a/g/blah: a/g/*
+a/g/scriggs.t: a/g/*.t
+a/scriggs.g: a/*.g
+base: *
+base.h: *
+debian/changelog: debian/*
+debian/control: debian/*
+debian/copyright: debian/*
+sample.png: *
+';
+stdout_is(sub {
+    $target10 = $app10->_build_file_mapping($target);
+}, $expected);
+cmp_deeply($target10, $target9);
 
 
