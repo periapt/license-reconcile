@@ -5,6 +5,8 @@ use Test::Deep;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::CopyrightTarget;
 use File::Slurp;
+use lib qw(t/lib);
+use TestData;
 
 is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
 my @list = Debian::LicenseReconcile::Errors->list;
@@ -58,19 +60,19 @@ my $data5 = {
     pattern=>'a/g/*.t',
 };
 cmp_deeply($copyright->map_directory('t/data/example'), {
-    'a/0.h'=>$data2,
-    'a/1.h'=>$data2,
-    'a/2.h'=>$data2,
-    'a/3.h'=>$data2,
-    'a/base'=>$data,
-    'a/g/blah'=>$data2u,
-    'a/g/scriggs.t'=>$data5,
-    'a/scriggs.g'=>$data4,
-    'base'=>$data,
-    'sample.png'=>$data,
-    'base.h'=>$data,
-    'debian/changelog'=>$data3,
-    'debian/control'=>$data3,
-    'debian/copyright'=>$data3,
+    'a/0.h'=>$COPYRIGHT_DATA2,
+    'a/1.h'=>$COPYRIGHT_DATA2,
+    'a/2.h'=>$COPYRIGHT_DATA2,
+    'a/3.h'=>$COPYRIGHT_DATA2,
+    'a/base'=>$COPYRIGHT_DATA,
+    'a/g/blah'=>$COPYRIGHT_DATA2u,
+    'a/g/scriggs.t'=>$COPYRIGHT_DATA5,
+    'a/scriggs.g'=>$COPYRIGHT_DATA4,
+    'base'=>$COPYRIGHT_DATA,
+    'sample.png'=>$COPYRIGHT_DATA,
+    'base.h'=>$COPYRIGHT_DATA,
+    'debian/changelog'=>$COPYRIGHT_DATA3,
+    'debian/control'=>$COPYRIGHT_DATA3,
+    'debian/copyright'=>$COPYRIGHT_DATA3,
 }, 'directory mapping');
 
