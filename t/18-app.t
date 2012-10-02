@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 37;
+use Test::More tests => 39;
 use Test::Deep;
 use Test::Output;
 use Debian::LicenseReconcile::Errors;
@@ -160,4 +160,21 @@ stdout_is(sub {
 }, $expected);
 cmp_deeply($target10, $target9);
 
+my $app11 = Debian::LicenseReconcile::App->new(
+    copyright=>'t/data/example/debian/copyright',
+    format_spec=>1,
+    directory=>'t/data/example',
+    display_mapping => 0,
+    changelog_file=>'t/data/example/debian/changelog',
+    config_file=>'t/data/example/debian/license-reconcile.yml',
+    filters=>['Rules', 'Std', 'Shebang', 'ChangeLog', 'Default~Std'],
+);
+isa_ok($app11, 'Debian::LicenseReconcile::App');
+TODO: {
+    local $TODO = "untrapped error in licensecheck";
+my $expected;
+stderr_is(sub {
+#    $app11->run
+}, $expected);
+}
 

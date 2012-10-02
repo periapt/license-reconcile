@@ -142,10 +142,15 @@ sub _run_filter {
     $class->require;
     my @files_remaining
         = grep {not exists $file_checked->{$_}} keys %$file_mapping;
+    my $our_config = {rules=>[]};
+    if (exists $config->{$filter_name}->{rules}
+        and ref $config->{$filter_name}->{rules} eq 'ARRAY') {
+        $our_config = $config->{$filter_name};
+    }
     my $test = $class->new(
         directory=>$self->directory,
         files_remaining=>\@files_remaining,
-        config=>$config->{$filter_name},
+        config=>$our_config,
         changelog=>$changelog,
         licensecheck=>$licensecheck,
         name=>$filter_name,
