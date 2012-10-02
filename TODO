@@ -5,11 +5,12 @@ still checkable.
 3.) There is a bug in the licensecheck handling
 licensecheck gets the results for cmd-line-utils/libedit/tty.c
 but the wrapper does not return it
-4.) test coverage
+4.) interpolating arrays
 5.) debian packaging
 6.) The empty rule really screws up. License and Copyright should default to that
 obtained by licensecheck
 ------------------------------------------------------------------------------
+4.) test coverage
 *) config should be below debian/source actually and we should be cleverer about
 the name.
 *.) Max relative width should be configurable

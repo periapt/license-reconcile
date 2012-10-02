@@ -29,6 +29,7 @@ my $builder = Module::Build->new(
         'File::MMagic' => 0,
         'File::FnMatch' => 0,
         'Set::IntSpan' => 0,
+        'System::Command' => 0,
         'Text::LevenshteinXS' => 0,
     },
     add_to_cleanup      => [ 'Debian-LicenseReconcile-*' ],
