@@ -11,6 +11,11 @@ our @EXPORT = qw(
     $COPYRIGHT_DATA3
     $COPYRIGHT_DATA4
     $COPYRIGHT_DATA5
+    $DLR_ERROR1
+    $DLR_ERROR2
+    $DLR_ERROR3
+    $DLR_ERROR4
+    $DLR_ERROR5
 );
 
 Readonly our $COPYRIGHT_DATA => {
@@ -51,5 +56,26 @@ Readonly our $COPYRIGHT_DATA5 => {
     copyright=>$COPYRIGHT_DATA4->{copyright},
     license=>$COPYRIGHT_DATA4->{license},
     pattern=>'a/g/*.t',
+};
+Readonly our $DLR_ERROR1 => {
+    test=>'FormatSpec',
+    msg=>'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/',
+};
+Readonly our $DLR_ERROR2 => {
+    test=>'CopyrightParsing',
+    msg=>'Invalid field given (Flossy) at /usr/local/share/perl/5.14.2/Debian/Copyright.pm line 141
+',
+};
+Readonly our $DLR_ERROR3 => {
+    test=>'License mismatch',
+    msg=>'File base.h has license GPL-2 which does not match Artistic or GPL-2+.',
+};
+Readonly our $DLR_ERROR4 => {
+    test=>'Copyright mismatch',
+    msg=>"File base.h: Trying to match 'Copyright: 2011, Periapt Technologies. All rights reserved' against 'Nicholas Bamber <nicholas\@periapt.co.uk>' but it does not look like a good match.",
+};
+Readonly our $DLR_ERROR5 => {
+    test=>'License mismatch',
+    msg=>'File debian/control has license GPL-2+ which does not match Artistic or GPL-2+.',
 };
 1

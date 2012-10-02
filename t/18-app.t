@@ -34,10 +34,7 @@ isa_ok($app3, 'Debian::LicenseReconcile::App');
 my $target3 = $app3->_read_copyright_file;
 is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
 my @list = Debian::LicenseReconcile::Errors->list;
-my $error1 = 'Cannot recognize format: Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.O/';
-cmp_deeply(\@list, [
-    { test=>'FormatSpec', msg=>$error1, },
-], 'initial state');
+cmp_deeply(\@list, [ $DLR_ERROR1 ], 'initial state');
 isa_ok($target3, 'Debian::LicenseReconcile::CopyrightTarget');
 
 my $app4 = Debian::LicenseReconcile::App->new(
@@ -48,12 +45,7 @@ isa_ok($app4, 'Debian::LicenseReconcile::App');
 my $target4 = $app4->_read_copyright_file;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
-my $error2 = 'Invalid field given (Flossy) at /usr/local/share/perl/5.14.2/Debian/Copyright.pm line 141
-';
-cmp_deeply(\@list, [
-    { test=>'FormatSpec', msg=>$error1, },
-    { test=>'CopyrightParsing', msg=>$error2, },
-]);
+cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
 is($target4, undef);
 
 my $app5 = Debian::LicenseReconcile::App->new(
@@ -63,10 +55,7 @@ isa_ok($app5, 'Debian::LicenseReconcile::App');
 my $target5 = $app5->_parse_changelog;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
-cmp_deeply(\@list, [
-    { test=>'FormatSpec', msg=>$error1, },
-    { test=>'CopyrightParsing', msg=>$error2, },
-]);
+cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
 isa_ok($target5, 'Parse::DebianChangelog');
 
 my $app6 = Debian::LicenseReconcile::App->new(
@@ -76,10 +65,7 @@ isa_ok($app6, 'Debian::LicenseReconcile::App');
 my $target6 = $app6->_parse_config;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
-cmp_deeply(\@list, [
-    { test=>'FormatSpec', msg=>$error1, },
-    { test=>'CopyrightParsing', msg=>$error2, },
-]);
+cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
 cmp_deeply($target6, {licensecheck=>{}});
 
 my $app7 = Debian::LicenseReconcile::App->new(
@@ -89,10 +75,7 @@ isa_ok($app7, 'Debian::LicenseReconcile::App');
 my $target7 = $app7->_parse_config;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
-cmp_deeply(\@list, [
-    { test=>'FormatSpec', msg=>$error1, },
-    { test=>'CopyrightParsing', msg=>$error2, },
-]);
+cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
 cmp_deeply($target7, {licensecheck=>{},Rules=>[],Blah=>[undef]});
 
 my $app8 = Debian::LicenseReconcile::App->new(
@@ -102,10 +85,7 @@ isa_ok($app8, 'Debian::LicenseReconcile::App');
 my $target8 = $app8->_build_licensecheck($target7);
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
-cmp_deeply(\@list, [
-    { test=>'FormatSpec', msg=>$error1, },
-    { test=>'CopyrightParsing', msg=>$error2, },
-]);
+cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
 isa_ok($target8, 'Debian::LicenseReconcile::LicenseCheck');
 
 my $app9 = Debian::LicenseReconcile::App->new(
@@ -168,13 +148,23 @@ my $app11 = Debian::LicenseReconcile::App->new(
     changelog_file=>'t/data/example/debian/changelog',
     config_file=>'t/data/example/debian/license-reconcile.yml',
     filters=>['Rules', 'Std', 'Shebang', 'ChangeLog', 'Default~Std'],
+    quiet=>1,
 );
 isa_ok($app11, 'Debian::LicenseReconcile::App');
+$app11->run;
+@list = Debian::LicenseReconcile::Errors->list;
 TODO: {
-    local $TODO = "untrapped error in licensecheck";
-my $expected;
-stderr_is(sub {
-#    $app11->run
-}, $expected);
-}
-
+    local $TODO="array ref got interpolated into string";
+cmp_deeply(\@list, [
+    $DLR_ERROR1,
+    $DLR_ERROR2,
+    $DLR_ERROR3,
+    $DLR_ERROR4,
+    $DLR_ERROR5,
+    $DLR_ERROR5,
+    $DLR_ERROR5,
+    $DLR_ERROR5,
+    $DLR_ERROR5,
+    $DLR_ERROR5,
+]);
+};
