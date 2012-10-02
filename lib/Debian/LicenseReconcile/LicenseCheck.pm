@@ -4,8 +4,10 @@ use 5.006;
 use strict;
 use warnings;
 use Readonly;
-use System::Command;
-use File::Slurp;
+use IPC::Open3;
+use IO::Select;
+use Carp;
+use Symbol;
 
 Readonly my %LICENSE_MAPPING => (
     'Apache (v2.0)' => 'Apache-2.0',
@@ -36,6 +38,8 @@ Readonly my $PARSE_RE => qr{
     \s*                         # just in case
 }xms;
 
+Readonly my $CHUNK_SIZE => 1024;
+
 sub new {
     my $class = shift;
     my $self = {mapping=>{}};
@@ -60,9 +64,30 @@ sub get_info {
         push @commands, '--recursive';
     }
     push @commands, $subject;
-    my ( $pid, $in, $out, $err ) = System::Command->spawn(@commands);
-    close $in;
-    my $output = read_file $out;
+    my ( $in, $out, $err );
+    $err = gensym;
+    $out = gensym;
+    my $pid = eval {open3($in, $out, $err, @commands)};
+    croak $@ if $@;
+    my $output = "";
+    my $errput = "";
+    my $outlen = 0;
+    my $errlen = 0;
+    my $select = IO::Select->new($out, $err);
+EOF:
+    while(my @ready = $select->can_read) {
+        foreach my $fh (@ready) {
+            if ($fh == $out) {
+                $outlen = sysread $out, $output, $CHUNK_SIZE, $outlen;
+                last EOF if 0 == $outlen;
+            }
+            if ($fh == $err) {
+                $errlen = sysread $err, $errput, $CHUNK_SIZE, $errlen;
+                last EOF if 0 == $errlen;
+            }
+        }
+    }
+    croak $errput if $errput;
     my @results;
     while ($output =~ /$PARSE_RE/g) {
         my $file = substr($1, 1+length $self->{directory});
