@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-use Test::More tests => 40;
+use Test::More tests => 41;
 use Test::Deep;
 use Test::Output;
+use Test::NoWarnings;
 use Debian::LicenseReconcile::Errors;
 use Debian::LicenseReconcile::App;
 use lib qw(t/lib);

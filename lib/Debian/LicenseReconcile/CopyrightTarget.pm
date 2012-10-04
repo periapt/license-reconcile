@@ -42,9 +42,10 @@ sub patterns {
     my $self = shift;
     my %patterns;
     foreach my $pattern ($self->{files}->Keys) {
+        my $index = $self->{files}->Indices($pattern);
+        my $value = $self->{files}->Values($index);
         my @patterns = split $SPACE, $pattern;
         foreach my $key (@patterns) {
-            my $value = $self->{files}->Values($key);
             my $target_license = $value->License;
             $target_license =~ s{\n.*\z}{}xms;
             my $target_copyright = Debian::LicenseReconcile::CopyrightDatum->new(
