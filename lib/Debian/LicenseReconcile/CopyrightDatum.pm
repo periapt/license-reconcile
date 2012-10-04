@@ -39,7 +39,12 @@ sub new {
     my $self = {};
     bless $self, $class;
     my $text = shift;
-    if ($text) {
+    if (ref $text eq 'ARRAY') {
+        foreach my $line (@$text) {
+            $self->_parse($line);
+        }
+    }    
+    elsif ($text) {
         $self->_parse($text);
     }
     return $self;
@@ -68,7 +73,7 @@ sub contains {
         if not defined $other;
     my $other_class = blessed $other || '';
     if ($other_class ne 'Debian::LicenseReconcile::CopyrightDatum') {
-        $other = Debian::LicenseReconcile::CopyrightDatum->new("$other");
+        $other = Debian::LicenseReconcile::CopyrightDatum->new($other);
     }
 
     # 1.) Get lists of our and their copyright holders.

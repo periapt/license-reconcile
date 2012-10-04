@@ -16,6 +16,11 @@ our @EXPORT = qw(
     $DLR_ERROR3
     $DLR_ERROR4
     $DLR_ERROR5
+    $DLR_ERROR6
+    $DLR_ERROR7
+    $DLR_ERROR8
+    $DLR_ERROR9
+    $DLR_ERROR10
 );
 
 Readonly our $COPYRIGHT_DATA => {
@@ -77,5 +82,25 @@ Readonly our $DLR_ERROR4 => {
 Readonly our $DLR_ERROR5 => {
     test=>'License mismatch',
     msg=>'File debian/control has license GPL-2+ which does not match Artistic or GPL-2+.',
+};
+Readonly our $DLR_ERROR6 => {
+    test=>'Copyright mismatch',
+    msg=>"File debian/control: Trying to match 'Christian Schwarz <schwarz\@debian.org>' against 'Nicholas Bamber <nicholas\@periapt.co.uk>' but it does not look like a good match.",
+};
+Readonly our $DLR_ERROR7 => {
+    test=>'License mismatch',
+    msg=>"File debian/copyright has license GPL-2+ which does not match Artistic or GPL-2+.",
+};
+Readonly our $DLR_ERROR8 => {
+    test=>'Copyright mismatch',
+    msg=>"File debian/copyright: Trying to match 'Christian Schwarz <schwarz\@debian.org>' against 'Nicholas Bamber <nicholas\@periapt.co.uk>' but it does not look like a good match.",
+};
+Readonly our $DLR_ERROR9 => {
+    test=>'License mismatch',
+    msg=>"File debian/changelog has license GPL-2+ which does not match Artistic or GPL-2+.",
+};
+Readonly our $DLR_ERROR10 => {
+    test=>'Copyright mismatch',
+    msg=>"File debian/changelog: Trying to match 'Christian Schwarz <schwarz\@debian.org>' against 'Nicholas Bamber <nicholas\@periapt.co.uk>' but it does not look like a good match.",
 };
 1

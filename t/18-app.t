@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 39;
+use Test::More tests => 40;
 use Test::Deep;
 use Test::Output;
 use Debian::LicenseReconcile::Errors;
@@ -151,20 +151,17 @@ my $app11 = Debian::LicenseReconcile::App->new(
     quiet=>1,
 );
 isa_ok($app11, 'Debian::LicenseReconcile::App');
-$app11->run;
+is($app11->run, 1, 'exit status');
 @list = Debian::LicenseReconcile::Errors->list;
-TODO: {
-    local $TODO="array ref got interpolated into string";
 cmp_deeply(\@list, [
     $DLR_ERROR1,
     $DLR_ERROR2,
     $DLR_ERROR3,
     $DLR_ERROR4,
     $DLR_ERROR5,
-    $DLR_ERROR5,
-    $DLR_ERROR5,
-    $DLR_ERROR5,
-    $DLR_ERROR5,
-    $DLR_ERROR5,
+    $DLR_ERROR6,
+    $DLR_ERROR7,
+    $DLR_ERROR8,
+    $DLR_ERROR9,
+    $DLR_ERROR10,
 ]);
-};
