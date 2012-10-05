@@ -15,20 +15,22 @@ my @filters_override = ();
 my $config_file = 'debian/license-reconcile.yml';
 my $changelog_file = 'debian/changelog';
 
-my $copyright = 'debian/copyright';
+my $copyright_file = 'debian/copyright';
+my $check_copyright = 1;
 
 my $format_spec = 1;
 
 GetOptions(
     'help|?' => \$help,
     man => \$man,
-    'copyright=s' => \$copyright,
+    'copyright-file=s' => \$copyright_file,
     'format-spec!' => \$format_spec,
     'quiet!' => \$quiet,
     'display-mapping!' => \$display_mapping,
     'directory=s' => \$directory,
     'config-file=s' => \$config_file,
     'changelog-file=s' => \$changelog_file,
+    'check-copyright!' => \$check_copyright,
     'filters=s@' => sub {
         shift; # name of option
         my $value = shift;
@@ -45,7 +47,8 @@ if (@filters_override) {
 }
 
 my $app = Debian::LicenseReconcile::App->new(
-    copyright           => $copyright,
+    copyright           => $copyright_file,
+    check_copyright     => $check_copyright,
     changelog_file      => $changelog_file,
     format_spec         => $format_spec,
     config_file         => $config_file,
@@ -65,7 +68,7 @@ license-reconcile - reconcile debian/copyright against source
 
 B<license-reconcile> B<--help>|B<--man>
 
-B<license-reconcile> [B<--copyright=>I<file>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--filters=>I<module1 module2 ...>] [B<--config-file=>I<file>] [B<--changelog-file=>I<file>]
+B<license-reconcile> [B<--copyright-file=>I<file>] [B<--no-check-copyright>] [B<--no-format-spec>] [B<--quiet>] [B<--display-mapping>] [B<--directory=>I<directory>] [B<--filters=>I<module1 module2 ...>] [B<--config-file=>I<file>] [B<--changelog-file=>I<file>]
 
 =head1 DESCRIPTION
 
@@ -168,7 +171,7 @@ method.
 
 =head1 OPTIONS
 
-=head2 B<--copyright=>I<file>
+=head2 B<--copyright-file=>I<file>
 
 Specify an alternative copyright file. Defaults to C<debian/copyright>.
 
@@ -176,6 +179,10 @@ Specify an alternative copyright file. Defaults to C<debian/copyright>.
 
 Don't check the first line of the copyright file against permitted format
 specifications.
+
+=head2 B<--no-check-copyright>
+
+Don't check the copyright clauses.
 
 =head2 B<--quiet>
 

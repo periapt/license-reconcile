@@ -9,6 +9,7 @@ but the wrapper does not return it
 6.) The empty rule really screws up. License and Copyright should default to that
 obtained by licensecheck
 ------------------------------------------------------------------------------
+*.) proposal to eliminate dependency on System::Command in 'io' branch
 4.) test coverage
 *) config should be below debian/source actually and we should be cleverer about
 the name.
@@ -17,7 +18,6 @@ the name.
 4.) Need a Dh_Sequence as well.
 11.) exclude files from mapping configurably
 6.) Could do with a man page for the config file format.
-5.) Should be able to turn off copyright checking as it will be very slow.
 13.) floundered on bwctl format spec - double space after the colon.
 *) expose --check and --exclude licensecheck options
 *) file permissions rule clause

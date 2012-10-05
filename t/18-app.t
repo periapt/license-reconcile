@@ -146,6 +146,7 @@ my $app11 = Debian::LicenseReconcile::App->new(
     format_spec=>1,
     directory=>'t/data/example',
     display_mapping => 0,
+    check_copyright=>1,
     changelog_file=>'t/data/example/debian/changelog',
     config_file=>'t/data/example/debian/license-reconcile.yml',
     filters=>['Rules', 'Std', 'Shebang', 'ChangeLog', 'Default~Std'],

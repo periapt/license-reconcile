@@ -17,6 +17,7 @@ sub check {
     my $self = shift;
     my $subject = shift;
     my $target = shift;
+    my $copyright = shift;
     my $pattern = $target->{pattern};
     my $license = $subject->{license};
 
@@ -30,7 +31,7 @@ sub check {
             );
         }
     }
-    if ($subject->{copyright}) {
+    if ($subject->{copyright} and $copyright) {
         my $target_copyright = $self->{$pattern}->{copyright};
         my $msg = "";
         if (not $target_copyright->contains($subject->{copyright}, \$msg)) {

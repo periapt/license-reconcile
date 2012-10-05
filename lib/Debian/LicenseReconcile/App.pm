@@ -11,6 +11,7 @@ use Class::XSAccessor
         changelog_file => 'changelog_file',
         config_file => 'config_file',
         copyright => 'copyright',
+        check_copyright => 'check_copyright',
         directory =>'directory',
         filters => 'filters',
         format_spec => 'format_spec',
@@ -159,7 +160,11 @@ sub _run_filter {
         next if $file_checked->{$titbit->{file}};
         $file_checked->{$titbit->{file}} = 1;
         if (exists $file_mapping->{$titbit->{file}}) {
-            $reconcile->check($titbit, $file_mapping->{$titbit->{file}});
+            $reconcile->check(
+                $titbit,
+                $file_mapping->{$titbit->{file}},
+                $self->check_copyright,
+            );
         }
         else {
             Debian::LicenseReconcile::Errors->push(
@@ -232,6 +237,8 @@ object.
 =head2 config_file
 
 =head2 copyright
+
+=head2 check_copyright
 
 =head2 directory
 
