@@ -111,7 +111,9 @@ sub run {
 
         Readonly my $FILE_MAPPING => $self->_build_file_mapping($COPYRIGHT_TARGET);
         Readonly my $RECONCILE =>
-            Debian::LicenseReconcile->new($COPYRIGHT_TARGET->patterns);
+            Debian::LicenseReconcile->new(
+                $COPYRIGHT_TARGET->patterns($self->check_copyright)
+            );
         my $file_checked = {};
         foreach my $filter_name (@{$self->filters}) {
             $file_checked = $self->_run_filter(

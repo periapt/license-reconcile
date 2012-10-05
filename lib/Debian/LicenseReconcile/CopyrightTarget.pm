@@ -40,6 +40,7 @@ sub parse {
 
 sub patterns {
     my $self = shift;
+    my $check_copyright = shift;
     my %patterns;
     foreach my $pattern ($self->{files}->Keys) {
         my $index = $self->{files}->Indices($pattern);
@@ -48,13 +49,15 @@ sub patterns {
         foreach my $key (@patterns) {
             my $target_license = $value->License;
             $target_license =~ s{\n.*\z}{}xms;
-            my $target_copyright = Debian::LicenseReconcile::CopyrightDatum->new(
-                $value->Copyright
-            );
             $patterns{$key} = {
                 license => $target_license,
-                copyright=> $target_copyright,
             };
+            if ($check_copyright) {
+                $patterns{$key}->{copyright} =
+                    Debian::LicenseReconcile::CopyrightDatum->new(
+                        $value->Copyright
+                    );
+            }
         }
     }
     return \%patterns;
