@@ -27,7 +27,8 @@ Readonly my $NL_RE => qr{
 # We regard each line as a Set::IntSpan run list followed by free text.
 Readonly my $LINE_RE => qr{
     \A                          # start of string
-    ([0-9-,\s\(\)]*)            # Set::IntSpan
+    ([\d\-,\s\(\)]*\d)?         # Set::IntSpan
+    [\-,\s\(\)]*                # filler
     (.*\S)                      # free text copyright holder
     \z                          # end of string
 }xms;
@@ -157,7 +158,7 @@ sub contains {
             return _msg($msg_ref,
                 "For copyright holder '$their_key' (which looks like '$our_key') the years $their_years cannot be fitted into $our_years.");
         }
-        @pairs = @$unlike_subject;
+        @pairs = $unlike_subject ? @$unlike_subject : ();
     }
 
     return 1;
