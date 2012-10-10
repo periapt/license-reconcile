@@ -24,12 +24,19 @@ Readonly my $NL_RE => qr{
     \s*
 }xms;
 
+Readonly my $FILLER_RE => '[\-,\s\(\)]';
+
 # We regard each line as a Set::IntSpan run list followed by free text.
 Readonly my $LINE_RE => qr{
     \A                          # start of string
-    ([\d\-,\s\(\)]*\d)?         # Set::IntSpan
-    [\-,\s\(\)]*                # filler
-    (.*\S)                      # free text copyright holder
+    (?:Copyright:)?             # Copyright string
+    $FILLER_RE*                 # filler
+    (                           # start of Set::IntSpan
+        \d{4}                   # year
+        (?:$FILLER_RE+\d{4})*   # more years
+    )?                          # end of Set::IntSpan
+    $FILLER_RE*                 # filler
+    (.*)                        # free text copyright holder
     \z                          # end of string
 }xms;
 

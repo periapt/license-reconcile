@@ -77,7 +77,7 @@ Readonly our $DLR_ERROR3 => {
 };
 Readonly our $DLR_ERROR4 => {
     test=>'Copyright mismatch',
-    msg=>"File base.h: Trying to match 'Copyright: 2011, Periapt Technologies. All rights reserved' against 'Nicholas Bamber <nicholas\@periapt.co.uk>' but it does not look like a good match.",
+    msg=>"File base.h: Trying to match 'Periapt Technologies. All rights reserved' against 'Nicholas Bamber <nicholas\@periapt.co.uk>' but it does not look like a good match.",
 };
 Readonly our $DLR_ERROR5 => {
     test=>'License mismatch',
