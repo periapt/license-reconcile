@@ -7,6 +7,7 @@ use Scalar::Util qw(blessed);
 use Readonly;
 use Set::IntSpan;
 use Debian::LicenseReconcile::CopyrightDatum::Holder;
+use Debian::LicenseReconcile::Errors;
 use List::MoreUtils qw(part);
 
 # We allow the copyright to be given in square brackets.
@@ -66,7 +67,19 @@ sub _parse {
     }
     foreach my $line (split $NL_RE, $text) {
         if ($line =~ $LINE_RE) {
-            $self->{$2} = Set::IntSpan->new($1);
+            my $set_intspan = $1;
+            my $copyright_holder = $2;
+            $self->{$copyright_holder} = eval {
+                Set::IntSpan->new($set_intspan)
+            };
+            if ($@) {
+                my @err = split $NL_RE, $@;
+                Debian::LicenseReconcile::Errors->push(
+                    test => 'Copyright parsing',
+                    msg => "Trying to parse $set_intspan: $err[0]",
+                );
+                $self->{$copyright_holder} = Set::IntSpan->new;
+            }
         }
     }
     return;

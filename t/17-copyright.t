@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-use Test::More tests => 39;
+use Test::More tests => 44;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
+use Debian::LicenseReconcile::Errors;
 
 my $d = Debian::LicenseReconcile::CopyrightDatum->new;
 isa_ok($d, 'Debian::LicenseReconcile::CopyrightDatum');
@@ -86,6 +87,21 @@ my $d6=Debian::LicenseReconcile::CopyrightDatum->new($text3);
 $test2='haha';
 is($d6->contains($text, \$test2), 0);
 is($test2, "Was trying to match 'Blah Wah Ltd' to 'Blah4 Wah Ltd', but 'Blah WaT Ltd' would be matched as well so giving up.");
+is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
+
+my $text4='[Copyright: 1997--1998 Jan Pazdziora, adelton@fi.muni.cz]';
+my $d7=Debian::LicenseReconcile::CopyrightDatum->new($text4);
+$test2='haha';
+is($d7->contains('1997-1998 Jan Pazdziora, adelton@fi.muni.cz', \$test2), 0);
+is($test2, "For copyright holder 'Jan Pazdziora, adelton\@fi.muni.cz' the years 1997-1998 cannot be fitted into -.");
+is(Debian::LicenseReconcile::Errors->how_many,1,'how many');
+my @list = Debian::LicenseReconcile::Errors->list;
+cmp_deeply(\@list, [
+    {
+        test=>'Copyright parsing',
+        msg=>"Trying to parse 1997--1998: Set::IntSpan::_copy_run_list: Bad order: 1997--1998",
+    },
+], 'bad copyright');
 
 
 
