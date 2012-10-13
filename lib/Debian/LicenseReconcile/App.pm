@@ -84,6 +84,7 @@ sub _build_licensecheck {
     return Debian::LicenseReconcile::LicenseCheck->new(
         $self->directory,
         $config->{LicenseCheck},
+        $self->check_copyright,
     );
 }
 

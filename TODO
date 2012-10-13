@@ -6,7 +6,6 @@ still checkable.
 4.) The empty rule really screws up. License and Copyright should default to that
 obtained by licensecheck
 ------------------------------------------------------------------------------
-*.) Pass --no-check-copyright to licensecheck
 *.) proposal to eliminate dependency on System::Command in 'io' branch
 4.) test coverage
 *) config should be below debian/source actually and we should be cleverer about

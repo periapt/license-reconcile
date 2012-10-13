@@ -5,7 +5,7 @@ use Test::Deep;
 use Debian::LicenseReconcile::LicenseCheck;
 use Readonly;
 
-Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new('t/data');
+Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new('t/data', [], 1);
 
 isa_ok($LICENSECHECK, 'Debian::LicenseReconcile::LicenseCheck');
 

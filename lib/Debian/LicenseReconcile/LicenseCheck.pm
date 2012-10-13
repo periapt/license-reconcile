@@ -20,7 +20,7 @@ Readonly my %LICENSE_MAPPING => (
     'BSD (3 clause)' => 'BSD-3-clause',
 );
 
-Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf', '--copyright');
+Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf');
 
 Readonly my $PARSE_RE => qr{
     ^                           # beginning of line
@@ -30,7 +30,7 @@ Readonly my $PARSE_RE => qr{
     \s*                         # just in case
     $                           # end of line
     \s*                         # just in case
-    ([^\n]+)                    # copyright notice
+    ([^\n]+)?                   # copyright notice
     \s*                         # just in case
     $                           # end of line
     \s*                         # just in case
@@ -41,6 +41,7 @@ sub new {
     my $self = {mapping=>{}};
     $self->{directory} = shift;
     my $mapping = shift || [];
+    $self->{check_copyright} = shift;
     %{$self->{mapping}} = (%LICENSE_MAPPING, @$mapping);
     bless $self, $class;
     return $self;
@@ -56,6 +57,9 @@ sub get_info {
         $subject = $self->{directory};
     }
     my @commands = @SCRIPT;
+    if ($self->{check_copyright}) {
+        push @commands, '--copyright';
+    }
     if (-d $subject) {
         push @commands, '--recursive';
     }
@@ -69,11 +73,14 @@ sub get_info {
         my $license = $self->_cleanup_license($2);
         next if not $license;
         my $copyright = $3;
-        push @results, {
+        my $result = {
             file => $file,
             license => $license,
-            copyright => $copyright,
         };
+        if ($self->{check_copyright}) {
+            $result->{copyright} = $copyright;
+        }
+        push @results, $result;
     }
     return @results;
 }

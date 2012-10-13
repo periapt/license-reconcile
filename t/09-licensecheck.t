@@ -6,7 +6,7 @@ use Debian::LicenseReconcile::Filter::Std;
 use Debian::LicenseReconcile::LicenseCheck;
 use Readonly;
 
-Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new('t/data/example');
+Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new('t/data/example', [], 1);
 
 my $filter = Debian::LicenseReconcile::Filter::Std->new(
     licensecheck=>$LICENSECHECK,
