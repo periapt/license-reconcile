@@ -12,12 +12,21 @@ sub get_info {
     foreach my $file (@{$self->files_remaining}) {
         my $rule = $self->find_rule($file, $self->config->{rules});
         next if not $rule;
-        push @results, {
+        my $result = {
             file=>$file,
-            copyright=>$rule->{Copyright},
-            license=>$rule->{License},
             test=>$self->name,
         };
+        my @info;
+        if (not ($rule->{License} and $rule->{Copyright})) {
+            push @info, $self->licensecheck->get_info($file);
+        }
+        $result->{license}
+            = $rule->{License}
+            ? $rule->{License} : $info[0]->{license};
+        $result->{copyright}
+            = $rule->{Copyright}
+            ? $rule->{Copyright} : $info[0]->{copyright};
+        push @results, $result;
     }
     return @results;
 }
@@ -76,10 +85,10 @@ so that the rule will be regularly reviewed.
 This might include the reasons for the rule as well as any Debian or upstream bug
 reports relating to the rule.
 
-=item - License (mandatory) - the short form of the license.
+=item - License (optional) - the short form of the license. If not set the data given by L<licensecheck> is used.
 
-=item - Copyright (mandatory) - the copyright data in the same format as the
-C<debian/copyright> file.
+=item - Copyright (optional) - the copyright data in the same format as the
+C<debian/copyright> file. If not set the data given by L<licensecheck> is used.
 
 =back
 
