@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 5;
+use Test::More tests => 8;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 use Debian::LicenseReconcile::LicenseCheck;
@@ -35,5 +35,29 @@ cmp_deeply(\@data, [{
     file=>'rltty.c',
     license=>'GPL-2+',
     test=>'Rules3',
+    copyright=>'[Copyright: 1992-2005 Free Software Foundation, Inc]',
+}]);
+
+$filter = Debian::LicenseReconcile::Filter::Rules->new(
+    directory=>'t/data/',
+    config=>{
+        rules=>[ {
+            License=>'Apache-2.0',
+        }, ],
+    },
+    files_remaining=>[
+        'rltty.c',
+    ],
+    licensecheck=>$LICENSECHECK,
+    name=>'Rules4',
+);
+isa_ok($filter, 'Debian::LicenseReconcile::Filter');
+isa_ok($filter, 'Debian::LicenseReconcile::Filter::Rules');
+
+my @data = $filter->get_info;
+cmp_deeply(\@data, [{
+    file=>'rltty.c',
+    license=>'Apache-2.0',
+    test=>'Rules4',
     copyright=>'[Copyright: 1992-2005 Free Software Foundation, Inc]',
 }]);

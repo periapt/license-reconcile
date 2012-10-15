@@ -3,8 +3,6 @@
 and must not generate an error for a license mismatch. But the copyright is
 still checkable.
 3.) debian packaging
-4.) The empty rule really screws up. License and Copyright should default to that
-obtained by licensecheck
 ------------------------------------------------------------------------------
 *.) proposal to eliminate dependency on System::Command in 'io' branch
 4.) test coverage
