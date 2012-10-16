@@ -61,13 +61,14 @@ isa_ok($target5, 'Parse::DebianChangelog');
 
 my $app6 = Debian::LicenseReconcile::App->new(
     config_file =>'t/data/empty.yml',
+    filters=>['X','Y','Z'],
 );
 isa_ok($app6, 'Debian::LicenseReconcile::App');
 my $target6 = $app6->_parse_config;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
-cmp_deeply($target6, {licensecheck=>{}});
+cmp_deeply($target6, {licensecheck=>{},X=>{rules=>[]},Y=>{rules=>[]},Z=>{rules=>[]}});
 
 my $app7 = Debian::LicenseReconcile::App->new(
     config_file =>'t/data/almost.yml',
@@ -77,7 +78,7 @@ my $target7 = $app7->_parse_config;
 is(Debian::LicenseReconcile::Errors->how_many,2,'how many');
 @list = Debian::LicenseReconcile::Errors->list;
 cmp_deeply(\@list, [ $DLR_ERROR1, $DLR_ERROR2, ]);
-cmp_deeply($target7, {licensecheck=>{},Rules=>[],Blah=>[undef]});
+cmp_deeply($target7, {licensecheck=>{},Rules=>{rules=>[],blah=>undef},Blah=>[undef]});
 
 my $app8 = Debian::LicenseReconcile::App->new(
     directory=>'t/data/example',

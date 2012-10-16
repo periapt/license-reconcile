@@ -28,10 +28,6 @@ use Parse::DebianChangelog;
 use UNIVERSAL::require;
 use Config::Any;
 
-Readonly my %CONFIG_HASHES => (
-    licensecheck => 1,
-);
-
 sub _read_copyright_file {
     my $self = shift;
     my $copyright_text = scalar read_file($self->copyright);
@@ -62,18 +58,23 @@ sub _parse_config {
         flatten_to_hash=>1,
     })->{$self->config_file};
     if (not defined $config) {
-        $config = {licensecheck=>{}};
+        $config = {};
     }
-    foreach my $key (keys %$config, keys %CONFIG_HASHES) {
-        if ($CONFIG_HASHES{$key}) {
-            if (ref $config->{$key} ne 'HASH') {
-                $config->{$key}={};
+    if (not exists $config->{licensecheck}) {
+        $config->{licensecheck} = {};
+    }
+    if ($self->filters) {
+        foreach my $key (@{$self->filters}) {
+            if (not exists $config->{$key}) {
+                $config->{$key}={rules=>[]};
             }
-            next;
         }
-        if (ref $config->{$key} ne 'ARRAY') {
-            $config->{$key}=[];
-        }
+    }
+    foreach my $key (keys %$config) {
+        next if $key eq 'licensecheck';
+        next if ref $config->{$key} ne 'HASH';
+        next if exists $config->{$key}->{rules};
+        $config->{$key}->{rules}=[];
     }
     return $config;
 }

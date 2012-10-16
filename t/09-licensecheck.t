@@ -32,7 +32,7 @@ my $filter2 = Debian::LicenseReconcile::Filter::Std->new(
 isa_ok($filter2, 'Debian::LicenseReconcile::Filter');
 isa_ok($filter2, 'Debian::LicenseReconcile::Filter::Std');
 
-my @data = $filter2->get_info;
+@data = $filter2->get_info;
 cmp_deeply(\@data, [{
     file=>'base.h',
     license=>'GPL-2',

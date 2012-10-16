@@ -54,7 +54,7 @@ $filter = Debian::LicenseReconcile::Filter::Rules->new(
 isa_ok($filter, 'Debian::LicenseReconcile::Filter');
 isa_ok($filter, 'Debian::LicenseReconcile::Filter::Rules');
 
-my @data = $filter->get_info;
+@data = $filter->get_info;
 cmp_deeply(\@data, [{
     file=>'rltty.c',
     license=>'Apache-2.0',
