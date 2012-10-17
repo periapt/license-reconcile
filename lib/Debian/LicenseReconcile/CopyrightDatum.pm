@@ -9,6 +9,7 @@ use Set::IntSpan;
 use Debian::LicenseReconcile::CopyrightDatum::Holder;
 use Debian::LicenseReconcile::Errors;
 use List::MoreUtils qw(part);
+use Smart::Comments -ENV;
 
 # We allow the copyright to be given in square brackets.
 Readonly my $SQBR_RE => qr{
@@ -66,20 +67,20 @@ sub _parse {
         $text = $1;
     }
     foreach my $line (split $NL_RE, $text) {
-        if ($line =~ $LINE_RE) {
-            my $set_intspan = $1;
-            my $copyright_holder = $2;
-            $self->{$copyright_holder} = eval {
-                Set::IntSpan->new($set_intspan)
-            };
-            if ($@) {
-                my @err = split $NL_RE, $@;
-                Debian::LicenseReconcile::Errors->push(
-                    test => 'Copyright parsing',
-                    msg => "Trying to parse $set_intspan: $err[0]",
-                );
-                $self->{$copyright_holder} = Set::IntSpan->new;
-            }
+        my $match = ($line =~ $LINE_RE);
+        ### assert: $match
+        my $set_intspan = $1;
+        my $copyright_holder = $2;
+        $self->{$copyright_holder} = eval {
+            Set::IntSpan->new($set_intspan)
+        };
+        if ($@) {
+            my @err = split $NL_RE, $@;
+            Debian::LicenseReconcile::Errors->push(
+                test => 'Copyright parsing',
+                msg => "Trying to parse $set_intspan: $err[0]",
+            );
+            $self->{$copyright_holder} = Set::IntSpan->new;
         }
     }
     return;
@@ -168,7 +169,7 @@ sub contains {
                     return _msg($msg_ref,
                         "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_ours' would be matched as well so giving up."); 
                 }
-                die "SHOULD NOT GET HERE";
+                ### assert: 0
         }
         my $our_key = $subject->ours;
         my $their_key = $subject->theirs;
@@ -187,9 +188,8 @@ sub contains {
 sub _msg {
     my $msg_ref = shift;
     my $text = shift;
-    if ($msg_ref) {
-        $$msg_ref = $text;
-    }
+    ### assert: $msg_ref
+    $$msg_ref = $text;
     return 0;
 }
 

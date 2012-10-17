@@ -9,7 +9,6 @@ still checkable.
 *) config should be below debian/source actually and we should be cleverer about
 the name.
 *.) Max relative width should be configurable
-*.) Play with Smart::Comments
 4.) Need a Dh_Sequence as well.
 11.) exclude files from mapping configurably
 6.) Could do with a man page for the config file format.

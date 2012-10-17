@@ -32,6 +32,7 @@ my $builder = Module::Build->new(
         'Set::IntSpan' => 0,
         'System::Command' => 0,
         'Text::LevenshteinXS' => 0,
+        'Smart::Comments' => 0,
     },
     add_to_cleanup      => [ 'Debian-LicenseReconcile-*' ],
     create_makefile_pl => 'traditional',
