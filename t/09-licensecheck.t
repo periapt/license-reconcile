@@ -20,7 +20,7 @@ cmp_deeply(\@data, [{
     file=>'base.h',
     license=>'GPL-2',
     test=>'Std2',
-    copyright=>'Copyright: 2011, Periapt Technologies. All rights reserved',
+    copyright=>['Copyright: 2011, Periapt Technologies. All rights reserved'],
 }]);
 
 Readonly my $LICENSECHECK2 => Debian::LicenseReconcile::LicenseCheck->new('t/data/example', [], 0);

@@ -15,6 +15,11 @@ Readonly my $SQBR_RE => qr{
     \z
 }xms;
 
+Readonly my $SEP_RE => qr{
+    \s+
+    /
+    \s+
+}xms;
 
 Readonly my %LICENSE_MAPPING => (
     'Apache (v2.0)' => 'Apache-2.0',
@@ -90,7 +95,8 @@ sub get_info {
             if ($copyright =~ $SQBR_RE) {
                 $copyright = $1;
             }
-            $result->{copyright} = $copyright;
+            my @lines = split $SEP_RE, $copyright;
+            $result->{copyright} = \@lines;
         }
         push @results, $result;
     }

@@ -35,7 +35,7 @@ cmp_deeply(\@data, [{
     file=>'rltty.c',
     license=>'GPL-2+',
     test=>'Rules3',
-    copyright=>'Copyright: 1992-2005 Free Software Foundation, Inc',
+    copyright=>['Copyright: 1992-2005 Free Software Foundation, Inc'],
 }]);
 
 $filter = Debian::LicenseReconcile::Filter::Rules->new(
@@ -59,5 +59,5 @@ cmp_deeply(\@data, [{
     file=>'rltty.c',
     license=>'Apache-2.0',
     test=>'Rules4',
-    copyright=>'Copyright: 1992-2005 Free Software Foundation, Inc',
+    copyright=>['Copyright: 1992-2005 Free Software Foundation, Inc'],
 }]);
