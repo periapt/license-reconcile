@@ -93,7 +93,7 @@ sub get_info {
             $addresult = 1;
             $result->{license} = $license;
         }
-        if ($self->{check_copyright}) {
+        if ($self->{check_copyright} and $copyright) {
             $addresult = 1;
             $copyright =~ $SQBR_RE;
             $copyright = $1;
