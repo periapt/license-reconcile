@@ -31,14 +31,24 @@ Readonly my $FILLER_RE => '[\-,\s\(\)]';
 # We regard each line as a Set::IntSpan run list followed by free text.
 Readonly my $LINE_RE => qr{
     \A                          # start of string
-    (?:Copyright:)?             # Copyright string
+    (?:
+        Copyright
+        (?:\s+\([cC]\)\s*?)?
+        [:\s]
+    )?                          # Copyright string
     $FILLER_RE*                 # filler
     (                           # start of Set::IntSpan
         \d{4}                   # year
         (?:$FILLER_RE+\d{4})*   # more years
     )?                          # end of Set::IntSpan
     $FILLER_RE*                 # filler
-    (.*)                        # free text copyright holder
+    (.*?)                       # free text copyright holder
+    (?:                         # All rights reserved
+        \s*
+        All\s+rights\s+reserved
+        \.?
+    )?
+    \s*
     \z                          # end of string
 }xms;
 
@@ -67,6 +77,7 @@ sub _parse {
         $text = $1;
     }
     foreach my $line (split $NL_RE, $text) {
+        next if not $line;
         my $match = ($line =~ $LINE_RE);
         ### assert: $match
         my $set_intspan = $1;
@@ -156,20 +167,18 @@ sub contains {
         my $subject = $pairs[0];
         my ($like_subject, $unlike_subject) = part {not $subject->touches($_)} @pairs;
         if ($subject->is_ambiguous($like_subject)) {
-                my $friend = $like_subject->[1];
-                my $subject_ours = $subject->ours;
-                my $friend_ours = $friend->ours;
-                my $subject_theirs = $subject->theirs;
-                my $friend_theirs = $friend->theirs;
-                if ($subject_ours eq $friend_ours) {
-                    return _msg($msg_ref,
-                        "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_theirs' would match as well so giving up."); 
-                }
-                if ($subject_theirs eq $friend_theirs) {
-                    return _msg($msg_ref,
-                        "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_ours' would be matched as well so giving up."); 
-                }
-                ### assert: 0
+            my $friend = $like_subject->[1];
+            my $subject_ours = $subject->ours;
+            my $friend_ours = $friend->ours;
+            my $subject_theirs = $subject->theirs;
+            my $friend_theirs = $friend->theirs;
+            if ($subject_ours eq $friend_ours) {
+                return _msg($msg_ref,
+                    "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_theirs' would match as well so giving up."); 
+            }
+            ### assert: $subject_theirs eq $friend_theirs
+            return _msg($msg_ref,
+                "Was trying to match '$subject_theirs' to '$subject_ours', but '$friend_ours' would be matched as well so giving up."); 
         }
         my $our_key = $subject->ours;
         my $their_key = $subject->theirs;
