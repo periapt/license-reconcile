@@ -6,6 +6,7 @@ use warnings;
 use Readonly;
 use System::Command;
 use File::Slurp;
+use Smart::Comments -ENV;
 
 Readonly my $SQBR_RE => qr{
     \A
@@ -85,19 +86,22 @@ sub get_info {
     while ($output =~ /$PARSE_RE/g) {
         my $file = substr($1, 1+length $self->{directory});
         my $license = $self->_cleanup_license($2);
-        next if not $license;
         my $copyright = $3;
-        my $result = {
-            file => $file,
-            license => $license,
-        };
+        my $addresult = 0;
+        my $result = { file => $file };
+        if ($license) {
+            $addresult = 1;
+            $result->{license} = $license;
+        }
         if ($self->{check_copyright}) {
-            if ($copyright =~ $SQBR_RE) {
-                $copyright = $1;
-            }
+            $addresult = 1;
+            $copyright =~ $SQBR_RE;
+            $copyright = $1;
+            ### assert: $copyright
             my @lines = split $SEP_RE, $copyright;
             $result->{copyright} = \@lines;
         }
+        next if not $addresult;
         push @results, $result;
     }
     return @results;

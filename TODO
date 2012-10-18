@@ -1,9 +1,5 @@
 1) reconcile bwctl and mysql
-2.) Need to treat UNKNOWN license differently. We have no license to check
-and must not generate an error for a license mismatch. But the copyright is
-still checkable.
 3.) debian packaging
-4.) licensecheck has '/' as a line separator
 ------------------------------------------------------------------------------
 *.) proposal to eliminate dependency on System::Command in 'io' branch
 4.) test coverage
