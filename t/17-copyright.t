@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 44;
+use Test::More tests => 40;
 use Test::Deep;
 use Debian::LicenseReconcile::CopyrightDatum;
 use Debian::LicenseReconcile::Errors;
@@ -17,20 +17,13 @@ my $copyright = \'blah';
 is($d->contains($copyright, \$test), 0);
 is($$copyright, 'blah');
 like($test, qr/1 cannot be fitted into 0:/);
-is($d->contains('[]', \$test), 1, 'square brackets');
-like($test, qr/1 cannot be fitted into 0:/);
 
 undef $copyright;
 is($d->contains($copyright, \$test), 0, 'undefined other');
 is($copyright, undef);
 is($test, 'The other copyright data was undefined.');
 
-my $d2=Debian::LicenseReconcile::CopyrightDatum->new('[]');
-isa_ok($d2, 'Debian::LicenseReconcile::CopyrightDatum');
-my @dk2 = $d2->copyright_holders;
-cmp_deeply(\@dk2, [], 'copyright holders');
-
-my $d3=Debian::LicenseReconcile::CopyrightDatum->new('[ ]');
+my $d3=Debian::LicenseReconcile::CopyrightDatum->new(' ');
 isa_ok($d3, 'Debian::LicenseReconcile::CopyrightDatum');
 my @dk3 = $d3->copyright_holders;
 cmp_deeply(\@dk3, [], 'copyright holders');
@@ -89,7 +82,7 @@ is($d6->contains($text, \$test2), 0);
 is($test2, "Was trying to match 'Blah Wah Ltd' to 'Blah4 Wah Ltd', but 'Blah WaT Ltd' would be matched as well so giving up.");
 is(Debian::LicenseReconcile::Errors->how_many,0,'how many');
 
-my $text4='[Copyright: 1997--1998 Jan Pazdziora, adelton@fi.muni.cz]';
+my $text4='Copyright: 1997--1998 Jan Pazdziora, adelton@fi.muni.cz';
 my $d7=Debian::LicenseReconcile::CopyrightDatum->new($text4);
 $test2='haha';
 is($d7->contains('1997-1998 Jan Pazdziora, adelton@fi.muni.cz', \$test2), 0);

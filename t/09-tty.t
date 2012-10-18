@@ -13,5 +13,5 @@ my @data = $LICENSECHECK->get_info('tty.c');
 cmp_deeply(\@data, [{
     file=>'tty.c',
     license=>'BSD-3-clause',
-    copyright=>'[Copyright: 1992, 1993]',
+    copyright=>'Copyright: 1992, 1993',
 }]);

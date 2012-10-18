@@ -11,15 +11,6 @@ use Debian::LicenseReconcile::Errors;
 use List::MoreUtils qw(part);
 use Smart::Comments -ENV;
 
-# We allow the copyright to be given in square brackets.
-Readonly my $SQBR_RE => qr{
-    \A
-    \[
-    ([^]]*)
-    \]
-    \z
-}xms;
-
 Readonly my $NL_RE => qr{
     \s*
     $
@@ -73,9 +64,6 @@ sub new {
 sub _parse {
     my $self = shift;
     my $text = shift;
-    if ($text =~ $SQBR_RE) {
-        $text = $1;
-    }
     foreach my $line (split $NL_RE, $text) {
         next if not $line;
         my $match = ($line =~ $LINE_RE);

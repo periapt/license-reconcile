@@ -7,6 +7,15 @@ use Readonly;
 use System::Command;
 use File::Slurp;
 
+Readonly my $SQBR_RE => qr{
+    \A
+    \[
+    ([^]]*)
+    \]
+    \z
+}xms;
+
+
 Readonly my %LICENSE_MAPPING => (
     'Apache (v2.0)' => 'Apache-2.0',
     'GPL' => 'GPL-2',
@@ -78,6 +87,9 @@ sub get_info {
             license => $license,
         };
         if ($self->{check_copyright}) {
+            if ($copyright =~ $SQBR_RE) {
+                $copyright = $1;
+            }
             $result->{copyright} = $copyright;
         }
         push @results, $result;
