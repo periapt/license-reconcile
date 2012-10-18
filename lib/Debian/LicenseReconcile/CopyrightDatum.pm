@@ -36,7 +36,7 @@ Readonly my $LINE_RE => qr{
     (.*?)                       # free text copyright holder
     (?:                         # All rights reserved
         \s*
-        All\s+rights\s+reserved
+        All\s+[Rr]ights\s+[Rr]eserved
         \.?
     )?
     \s*
