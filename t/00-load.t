@@ -1,6 +1,6 @@
 #!perl 
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 use Test::Compile;
 
 BEGIN {
@@ -18,6 +18,7 @@ BEGIN {
     use_ok( 'Debian::LicenseReconcile::Filter::Std' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::Filter::Shebang' ) || print "Bail out!\n";
     use_ok( 'Debian::LicenseReconcile::Filter::ChangeLog' ) || print "Bail out!\n";
+    use_ok( 'Debian::LicenseReconcile::VerifyLicense' ) || print "Bail out!\n";
 }
 
 diag( "Testing Debian::LicenseReconcile $Debian::LicenseReconcile::VERSION, Perl $], $^X" );
