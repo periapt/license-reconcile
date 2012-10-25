@@ -62,35 +62,8 @@ our $VERSION = '0.01';
 Returns a list of hash references describing copyright and license information
 that should be checked against the copyright target. The results returned
 are those obtained by applying the rules in the config file in sequence.
-Each rule might have the following fields:
-
-=over
-
-=item - Glob (optional) - a file glob to limit which files the rule applies to.
-
-=item - Contains (optional) - a piece of text which the file must contain for the
-rule to apply.
-
-=item - Matches (optional) - an extended regular expression which the file contents
-must match for the rule to apply.
-
-=item - MMagic (optional) - a string which must equal the magic value obtained from
-L<File::MMagic> for the rule to apply.
-
-=item - MaxVersion (optional) - an upstream version string after which the rule will
-not be applied. This is recommended unless you are certain that the rule is robust
-so that the rule will be regularly reviewed.
-
-=item - Justification (optional) - free text documentation concerning the rule.
-This might include the reasons for the rule as well as any Debian or upstream bug
-reports relating to the rule.
-
-=item - License (optional) - the short form of the license. If not set the data given by L<licensecheck> is used.
-
-=item - Copyright (optional) - the copyright data in the same format as the
-C<debian/copyright> file. If not set the data given by L<licensecheck> is used.
-
-=back
+Each rule might have the fields as discussed in 
+L<Debian::LicenseReconcile::Filter>.
 
 =head1 AUTHOR
 

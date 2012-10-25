@@ -49,6 +49,11 @@ sub find_rule {
             my $max_version = Dpkg::Version->new($rule->{MaxVersion});
             next if $this_version > $max_version;
         }
+        if (exists $rule->{VerifyLicense}) {
+            my @info = $self->licensecheck->get_info($file);
+            next if scalar @info == 0;
+            next if -1 == index $info[0]->{license}, $rule->{VerifyLicense};
+        }
         if (not $contents) {
             $contents = read_file($self->directory."/$file");
         }
@@ -147,9 +152,12 @@ must match for the rule to apply.
 =item - MMagic (optional) - a string which must equal the magic value obtained from
 L<File::MMagic> for the rule to apply.
 
-=item - MaxVersion (optional) - an upstream version string after which the rule will
-not be applied. This is recommended unless you are certain that the rule is robust
-so that the rule will be regularly reviewed.
+=item - MaxVersion (optional) - an upstream version string after which the rule
+will not be applied. This is recommended unless you are certain that the rule
+is robust so that the rule will be regularly reviewed.
+
+=item - VerifyLicense (optional) - a string which must be present in the
+license portion of L<licensecheck> output.
 
 =back
 
