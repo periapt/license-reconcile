@@ -25,7 +25,7 @@ my $filter = Debian::LicenseReconcile::Filter::Rules->new(
                 Copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
             },
             {
-                VerifyLicense=>'GPL-2',
+                VerifyLicense=>'GPL (v2)',
                 License=>'Blah2',
                 Copyright=>'[Copyright: 2012, Periapt Technologies. All rights reserved]',
             },

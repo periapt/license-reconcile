@@ -50,9 +50,8 @@ sub find_rule {
             next if $this_version > $max_version;
         }
         if (exists $rule->{VerifyLicense}) {
-            my @info = $self->licensecheck->get_info($file);
-            next if scalar @info == 0;
-            next if -1 == index $info[0]->{license}, $rule->{VerifyLicense};
+            my $license = $self->licensecheck->raw_license($file);
+            next if -1 == index $license, $rule->{VerifyLicense};
         }
         if (not $contents) {
             $contents = read_file($self->directory."/$file");
