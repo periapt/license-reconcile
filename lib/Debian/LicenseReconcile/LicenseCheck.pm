@@ -4,8 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 use Readonly;
-use System::Command;
-use File::Slurp;
 use Smart::Comments -ENV;
 
 Readonly my $SQBR_RE => qr{
@@ -35,7 +33,7 @@ Readonly my %LICENSE_MAPPING => (
     'BSD (3 clause)' => 'BSD-3-clause',
 );
 
-Readonly my @SCRIPT => ('/usr/bin/licensecheck', '--no-conf');
+Readonly my $SCRIPT => '/usr/bin/licensecheck --no-conf';
 
 Readonly my $PARSE_RE => qr{
     ^                           # beginning of line
@@ -71,17 +69,15 @@ sub get_info {
     else {
         $subject = $self->{directory};
     }
-    my @commands = @SCRIPT;
+    my $commands = $SCRIPT;
     if ($self->{check_copyright}) {
-        push @commands, '--copyright';
+        $commands .= ' --copyright';
     }
     if (-d $subject) {
-        push @commands, '--recursive';
+        $commands .= ' --recursive';
     }
-    push @commands, $subject;
-    my ( $pid, $in, $out, $err ) = System::Command->spawn(@commands);
-    close $in;
-    my $output = read_file $out;
+    $commands .= " $subject" ;
+    my $output = `$commands`;
     my @results;
     while ($output =~ /$PARSE_RE/g) {
         my $file = substr($1, 1+length $self->{directory});
@@ -125,12 +121,8 @@ sub raw_license {
     my $subject = shift;
     ### assert: $subject and -f $subject
     $subject = "$self->{directory}/$subject";
-    my @commands = @SCRIPT;
-    push @commands, $subject;
-    my ( $pid, $in, $out, $err ) = System::Command->spawn(@commands);
-    close $in;
-    my $output = read_file $out;
-    my @results;
+    my $commands = "$SCRIPT $subject";
+    my $output = `$commands`;
     if ($output =~ /$PARSE_RE/g) {
         return $2;
     }
