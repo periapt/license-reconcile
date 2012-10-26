@@ -51,7 +51,7 @@ Readonly my $PARSE_RE => qr{
 
 sub new {
     my $class = shift;
-    my $self = {mapping=>{}};
+    my $self = {mapping=>{},raw_license=>{}};
     $self->{directory} = shift;
     my $mapping = shift || [];
     $self->{check_copyright} = shift;
@@ -81,7 +81,8 @@ sub get_info {
     my @results;
     while ($output =~ /$PARSE_RE/g) {
         my $file = substr($1, 1+length $self->{directory});
-        my $license = $self->_cleanup_license($2);
+        $self->{raw_license}->{$file} = $2;
+        my $license = $self->_cleanup_license($self->{raw_license}->{$file});
         my $copyright = $3;
         my $addresult = 0;
         my $result = { file => $file };
@@ -118,13 +119,15 @@ sub _cleanup_license {
 
 sub raw_license {
     my $self = shift;
-    my $subject = shift;
-    ### assert: $subject and -f $subject
-    $subject = "$self->{directory}/$subject";
+    my $file = shift;
+    ### assert: $file and -f $file;
+    return $self->{raw_license}->{$file} if exists $self->{raw_license}->{$file};
+    my $subject = "$self->{directory}/$file";
     my $commands = "$SCRIPT $subject";
     my $output = `$commands`;
     if ($output =~ /$PARSE_RE/g) {
-        return $2;
+        $self->{raw_license}->{$file} = $2;
+        return $self->{raw_license}->{$file};
     }
     return '';
 }
