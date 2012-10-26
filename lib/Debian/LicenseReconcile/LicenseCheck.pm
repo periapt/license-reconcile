@@ -51,39 +51,27 @@ Readonly my $PARSE_RE => qr{
 
 sub new {
     my $class = shift;
-    my $self = {mapping=>{},raw_license=>{}};
+    my $self = {
+        mapping=>{},
+        raw=>{},
+    };
     $self->{directory} = shift;
     my $mapping = shift || [];
     $self->{check_copyright} = shift;
     %{$self->{mapping}} = (%LICENSE_MAPPING, @$mapping);
     bless $self, $class;
+    $self->_get_raw_data;
     return $self;
 }
 
 sub get_info {
     my $self = shift;
     my $subject = shift;
-    if (defined $subject) {
-        $subject = "$self->{directory}/$subject";
-    }
-    else {
-        $subject = $self->{directory};
-    }
-    my $commands = $SCRIPT;
-    if ($self->{check_copyright}) {
-        $commands .= ' --copyright';
-    }
-    if (-d $subject) {
-        $commands .= ' --recursive';
-    }
-    $commands .= " $subject" ;
-    my $output = `$commands`;
+    my @files = $subject ? ($subject) : keys %{$self->{raw}};
     my @results;
-    while ($output =~ /$PARSE_RE/g) {
-        my $file = substr($1, 1+length $self->{directory});
-        $self->{raw_license}->{$file} = $2;
-        my $license = $self->_cleanup_license($self->{raw_license}->{$file});
-        my $copyright = $3;
+    foreach my $file (@files) {
+        my $license = $self->_cleanup_license($self->{raw}->{$file}->{license});
+        my $copyright = $self->{raw}->{$file}->{copyright};
         my $addresult = 0;
         my $result = { file => $file };
         if ($license) {
@@ -104,6 +92,34 @@ sub get_info {
     return @results;
 }
 
+sub _get_raw_data {
+    my $self = shift;
+    my $subject = shift;
+    if (defined $subject) {
+        $subject = "$self->{directory}/$subject";
+    }
+    else {
+        $subject = $self->{directory};
+    }
+    my $commands = $SCRIPT;
+    if ($self->{check_copyright}) {
+        $commands .= ' --copyright';
+    }
+    if (-d $subject) {
+        $commands .= ' --recursive';
+    }
+    $commands .= " $subject" ;
+    my $output = `$commands`;
+    while ($output =~ /$PARSE_RE/g) {
+        my $file = substr($1, 1+length $self->{directory});
+        $self->{raw}->{$file} = {
+            license => $2,
+            copyright => $3,
+        };
+    }
+    return;
+}
+
 sub _cleanup_license {
     my $self = shift;
     my $license = shift;
@@ -121,14 +137,9 @@ sub raw_license {
     my $self = shift;
     my $file = shift;
     ### assert: $file and -f $file;
-    return $self->{raw_license}->{$file} if exists $self->{raw_license}->{$file};
-    my $subject = "$self->{directory}/$file";
-    my $commands = "$SCRIPT $subject";
-    my $output = `$commands`;
-    if ($output =~ /$PARSE_RE/g) {
-        $self->{raw_license}->{$file} = $2;
-        return $self->{raw_license}->{$file};
-    }
+    return $self->{raw}->{$file}->{license} if exists $self->{raw}->{$file};
+    $self->_get_raw_data($file);
+    return $self->{raw}->{$file}->{license} if exists $self->{raw}->{$file};
     return '';
 }
 
