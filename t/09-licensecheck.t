@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Deep;
+use Test::NoWarnings;
 use Debian::LicenseReconcile::Filter::Std;
 use Debian::LicenseReconcile::LicenseCheck;
 use Readonly;

@@ -70,21 +70,25 @@ sub get_info {
     my @files = $subject ? ($subject) : keys %{$self->{raw}};
     my @results;
     foreach my $file (@files) {
-        my $license = $self->_cleanup_license($self->{raw}->{$file}->{license});
+        my $license = $self->{raw}->{$file}->{license};
         my $copyright = $self->{raw}->{$file}->{copyright};
         my $addresult = 0;
         my $result = { file => $file };
         if ($license) {
-            $addresult = 1;
-            $result->{license} = $license;
+            $license = $self->_cleanup_license($license);
+            if ($license) {
+                $addresult = 1;
+                $result->{license} = $license;
+            }
         }
         if ($self->{check_copyright} and $copyright) {
-            $addresult = 1;
             $copyright =~ $SQBR_RE;
             $copyright = $1;
-            ### assert: $copyright
-            my @lines = split $SEP_RE, $copyright;
-            $result->{copyright} = \@lines;
+            if ($copyright) {
+                $addresult = 1;
+                my @lines = split $SEP_RE, $copyright;
+                $result->{copyright} = \@lines;
+            }
         }
         next if not $addresult;
         push @results, $result;
