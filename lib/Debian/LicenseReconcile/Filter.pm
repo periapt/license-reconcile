@@ -28,6 +28,15 @@ sub get_info {
     die "not implemented in base class";
 }
 
+sub _fnmatch_split {
+    my $glob = shift;
+    my $file = shift;
+    foreach my $s (split ' ', $glob) {
+        return 1 if fnmatch($s, $file);
+    }
+    return 0;
+}
+
 sub find_rule {
     my $self = shift;
     my $file = shift;
@@ -39,7 +48,7 @@ sub find_rule {
 
         # Run through the test clauses
         if (exists $rule->{Glob}) {
-            next if not fnmatch($rule->{Glob}, $file);
+            next if not _fnmatch_split($rule->{Glob}, $file);
         }
         if (exists $rule->{MaxVersion}) {
             if (not $this_version) {
