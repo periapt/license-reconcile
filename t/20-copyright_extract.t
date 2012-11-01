@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 7;
+use Test::More tests => 3;
 use Test::Deep;
 use Test::NoWarnings;
 use Debian::LicenseReconcile::LicenseCheck;
@@ -20,7 +20,7 @@ cmp_deeply(\@data, [{
 
 @data = $LICENSECHECK->get_info(
     'copyright_extract1',
-    '(?:Copyright\s+\(C\)\s+((?:\d{4}(?:\s|,\s|\-))*Google\s+Inc)\.\s*\R+)?\s*Copyright\s+\(c\)\s+(2008\s+MySQL\s+AB),\s+(2008-2009\s+Sun\s+Microsystems,\s+Inc)\.',
+    '(?:Copyright\s+\(C\)\s+((?:\d{4}(?:\s|,\s|\-))*Google\s+Inc)\.\s*\R+)?\s*Copyright\s+\(c\)\s+((?:\d{4}(?:\s|,\s|\-))*MySQL\s+AB),\s+((?:\d{4}(?:\s|,\s|\-))*Sun\s+Microsystems,\s+Inc)\.\s*\R+',
 );
 cmp_deeply(\@data, [{
     file=>'copyright_extract1',
