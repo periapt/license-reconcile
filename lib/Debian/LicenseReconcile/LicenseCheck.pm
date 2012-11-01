@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Readonly;
+use File::Slurp;
 use Smart::Comments -ENV;
 
 Readonly my $SQBR_RE => qr{
@@ -67,6 +68,7 @@ sub new {
 sub get_info {
     my $self = shift;
     my $subject = shift;
+    my $copyright_extract = shift;
     my @files = $subject ? ($subject) : keys %{$self->{raw}};
     my @results;
     foreach my $file (@files) {
@@ -81,17 +83,41 @@ sub get_info {
                 $result->{license} = $license;
             }
         }
-        if ($self->{check_copyright} and $copyright) {
-            $copyright =~ $SQBR_RE;
-            $copyright = $1;
-            if ($copyright) {
-                $addresult = 1;
-                my @lines = split $SEP_RE, $copyright;
-                $result->{copyright} = \@lines;
+        if ($self->{check_copyright}) {
+            my $found_copyright = 0;
+            if ($copyright_extract and
+                my @lines = $self->_extract_copyright($file, $copyright_extract)) {
+                    $result->{copyright} = \@lines;
+                    $addresult = 1;
+                    $found_copyright = 1;
+            }
+            if ($copyright and not $found_copyright) {
+                $copyright =~ $SQBR_RE;
+                $copyright = $1;
+                if ($copyright) {
+                    $addresult = 1;
+                    my @lines = split $SEP_RE, $copyright;
+                    $result->{copyright} = \@lines;
+                }
             }
         }
         next if not $addresult;
         push @results, $result;
+    }
+    return @results;
+}
+
+sub _extract_copyright {
+    my $self = shift;
+    my $file = shift;
+    my $copyright_extract = shift;
+    my $contents = read_file "$self->{directory}/$file";
+    my @lines = ($contents =~ m{$copyright_extract}xms);
+    my @results;
+    foreach my $line (@lines) {
+        next if not $line;
+        $line =~ s{\s*\R+\s*}{ }xmsg;
+        push @results, $line;
     }
     return @results;
 }
@@ -188,6 +214,13 @@ is passed, the results returned from this filter are those that are obtained fro
 C<licensecheck --no-conf --recursive --copyright DIR>.
 The optional file argument must be relative to the directory given to the
 constructor. If the file is a directory then the C<--recursive> option is used.
+
+Optionally this method may take an additional regular expression format string
+argument. If present this regular expression will be used to extract copyright
+data from the file contents in preference to what licensecheck returns. If the
+regular expression fails to match, licensecheck data will be used instead. The
+regular expression should have a capture for each line. A capture may span lines
+and the regular expression will be enclosed in C<m{...}xms>.
 
 =head2 raw_license 
 
