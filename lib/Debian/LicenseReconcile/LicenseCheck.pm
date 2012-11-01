@@ -72,6 +72,9 @@ sub get_info {
     my @files = $subject ? ($subject) : keys %{$self->{raw}};
     my @results;
     foreach my $file (@files) {
+        if (not exists $self->{raw}->{$file}) {
+            $self->_get_raw_data($file);
+        }
         my $license = $self->{raw}->{$file}->{license};
         my $copyright = $self->{raw}->{$file}->{copyright};
         my $addresult = 0;
