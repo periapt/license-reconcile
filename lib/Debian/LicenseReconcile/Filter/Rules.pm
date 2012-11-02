@@ -18,7 +18,7 @@ sub get_info {
         };
         my @info;
         if (not ($rule->{License} and $rule->{Copyright})) {
-            push @info, $self->licensecheck->get_info($file);
+            push @info, $self->licensecheck->get_info($file, $rule->{CopyrightExtract});
         }
         $result->{license}
             = $rule->{License}
@@ -64,6 +64,24 @@ that should be checked against the copyright target. The results returned
 are those obtained by applying the rules in the config file in sequence.
 Each rule might have the fields as discussed in 
 L<Debian::LicenseReconcile::Filter>.
+
+In addition the following fields are supported:
+
+=over
+
+=item License (optional) - Specifies the exact license value. If not set the 
+license will be obtained from L<licensecheck>.
+
+=item Copyright (optional) - Specifies the exact copyright value. If not set the 
+copyright will be obtained from L<licensecheck>.
+
+=item CopyrightExtract (optional) - Gives a regular expression that is used
+to get copyright data from the file contents. Each captured value will be a line
+assumed to contain a sequence of years and the copyright holder. The regular
+expression will be enclosed in C<m{....}xms>. Also it supports an additional 
+shorthand C<\Y> which represents a year followed by various separators.
+
+=back
 
 =head1 AUTHOR
 

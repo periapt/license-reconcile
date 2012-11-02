@@ -7,7 +7,7 @@ use Debian::LicenseReconcile::LicenseCheck;
 use Readonly;
 
 Readonly my $LICENSECHECK => Debian::LicenseReconcile::LicenseCheck->new('t/data', [], 1);
-Readonly my $RE => '(?:Copyright\s+\(C\)\s+((?:\d{4}(?:\s|,\s|\-))*Google\s+Inc)\.\s*\R+)?\s*Copyright\s+\(c\)\s+((?:\d{4}(?:\s|,\s|\-))*MySQL\s+AB),\s+((?:\d{4}(?:\s|,\s|\-))*Sun\s+Microsystems,\s+Inc)\.\s*\R+';
+Readonly my $RE => '(?:Copyright\s+\(C\)\s+(\Y+Google\s+Inc)\.\s*\R+)?\s*Copyright\s+\(c\)\s+(\Y+MySQL\s+AB),\s+(\Y+Sun\s+Microsystems,\s+Inc)\.\s*\R+';
 
 my @data = $LICENSECHECK->get_info('copyright_extract1');
 cmp_deeply(\@data, [{

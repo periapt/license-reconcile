@@ -7,6 +7,8 @@ use Readonly;
 use File::Slurp;
 use Smart::Comments -ENV;
 
+Readonly my $YEAR_RE => '(?:\d{4}(?:\s|,\s|\-))';
+
 Readonly my $SQBR_RE => qr{
     \A
     \[
@@ -113,6 +115,7 @@ sub _extract_copyright {
     my $self = shift;
     my $file = shift;
     my $copyright_extract = shift;
+    $copyright_extract =~ s{\\Y}{$YEAR_RE}xmsg;
     my $contents = read_file "$self->{directory}/$file";
     my @lines = ($contents =~ m{$copyright_extract}xms);
     my @results;
