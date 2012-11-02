@@ -172,8 +172,8 @@ sub raw_license {
     ### assert: $file and -f $file;
     return $self->{raw}->{$file}->{license} if exists $self->{raw}->{$file};
     $self->_get_raw_data($file);
-    return $self->{raw}->{$file}->{license} if exists $self->{raw}->{$file};
-    return '';
+    ### assert: exists $self->{raw}->{$file}->{license}
+    return $self->{raw}->{$file}->{license};
 }
 
 =head1 NAME
