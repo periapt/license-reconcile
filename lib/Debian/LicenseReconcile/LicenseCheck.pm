@@ -79,12 +79,11 @@ sub get_info {
         my $copyright = $self->{raw}->{$file}->{copyright};
         my $addresult = 0;
         my $result = { file => $file };
+        ### assert: $license
+        $license = $self->_cleanup_license($license);
         if ($license) {
-            $license = $self->_cleanup_license($license);
-            if ($license) {
-                $addresult = 1;
-                $result->{license} = $license;
-            }
+            $addresult = 1;
+            $result->{license} = $license;
         }
         if ($self->{check_copyright}) {
             my $found_copyright = 0;

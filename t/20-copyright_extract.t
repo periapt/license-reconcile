@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Deep;
 use Test::NoWarnings;
 use Debian::LicenseReconcile::LicenseCheck;
@@ -46,6 +46,16 @@ cmp_deeply(\@data, [{
         '2008 MySQL AB',
         '2008-2009 Sun Microsystems, Inc'],
 }]);
+
+@data = $LICENSECHECK->get_info('wtfpl', 'blah');
+cmp_deeply(\@data, [{
+    file=>'wtfpl',
+    license=>'WTFPL',
+    copyright=>[
+        'Copyright: 2004 Sam Hocevar <sam@hocevar.net>'],
+}]);
+
+
 
 
 
