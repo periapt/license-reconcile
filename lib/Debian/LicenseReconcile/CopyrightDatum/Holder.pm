@@ -28,6 +28,11 @@ sub _my_cmp {
     return $a->width <=> $b->width;
 }
 
+sub _my_str {
+    my $self = shift;
+    return "[".$self->ours.",".$self->theirs.",".$self->width."]";
+}
+
 sub touches {
     my $self = shift;
     my $other = shift;
@@ -48,7 +53,7 @@ sub relative_width {
     return 2.0*($self->width)/((length $self->ours) + (length $self->theirs));
 }
 
-use overload '<=>' => \&_my_cmp;
+use overload '<=>' => \&_my_cmp, '""' => \&_my_str;
 
 =head1 NAME
 
