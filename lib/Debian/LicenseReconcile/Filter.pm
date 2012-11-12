@@ -62,20 +62,21 @@ sub find_rule {
             my $license = $self->licensecheck->raw_license($file);
             next if -1 == index $license, $rule->{VerifyLicense};
         }
-        if (not $contents) {
-            $contents = read_file($self->directory."/$file");
+        if (exists $rule->{MMagic} or exists $rule->{Contains} or exists $rule->{Matches}) {
+            if (not $contents) {
+                $contents = read_file($self->directory."/$file");
+            }
+            if (exists $rule->{MMagic}) {
+                next if length $contents == 0; # don't apply magic to degenerates
+                next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
+            }
+            if (exists $rule->{Contains}) {
+                next if -1 == index $contents, $rule->{Contains};
+            }
+            if (exists $rule->{Matches}) {
+                next if $contents !~ qr/$rule->{Matches}/xms;
+            }
         }
-        if (exists $rule->{MMagic}) {
-            next if length $contents == 0; # don't apply magic to degenerates
-            next if $rule->{MMagic} ne $MMAGIC->checktype_contents($contents);
-        }
-        if (exists $rule->{Contains}) {
-            next if -1 == index $contents, $rule->{Contains};
-        }
-        if (exists $rule->{Matches}) {
-            next if $contents !~ qr/$rule->{Matches}/xms;
-        }
-            
 
         # Now we've found a matching rule
         $matching_rule = $rule;

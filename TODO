@@ -1,6 +1,7 @@
 1) reconcile bwctl and mysql
 3.) debian packaging
 ------------------------------------------------------------------------------
+*) should exclude swap files etc
 4.) test coverage
 *) config should be below debian/source actually and we should be cleverer about
 the name.
