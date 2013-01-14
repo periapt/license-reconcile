@@ -28,12 +28,19 @@ Readonly my %LICENSE_MAPPING => (
     'GPL' => 'GPL-2',
     'GPL-2' => 'GPL-2',
     'GPL (v2)' => 'GPL-2',
+    'GPL (v1 or later)' => 'GPL-1+',
     'GPL (v2 or later)' => 'GPL-2+',
+    'GPL (v3 or later)' => 'GPL-3+',
     'LGPL (v2)' => 'LGPL',
+    'LGPL (v2 or later)' => 'LGPL-2+',
+    'LGPL (v2.1)' => 'LGPL-2.1',
+    'LGPL (v2.1 or later)' => 'LGPL-2.1+',
     'zlib/libpng' => 'zlib/libpng',
     'BSD (4 clause)' => 'BSD-4-clause',
     'BSD (2 clause)' => 'BSD-2-clause',
     'BSD (3 clause)' => 'BSD-3-clause',
+    'MPL (v1.1)' => 'MPL-1.1',
+    'Public Domain' => 'public-domain',
 );
 
 Readonly my $SCRIPT => '/usr/bin/licensecheck --no-conf';
